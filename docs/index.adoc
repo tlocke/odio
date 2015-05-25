@@ -1,0 +1,317 @@
+= Imprimatur
+:toc:
+:toclevels: 1
+
+
+Imprimatur is a tool for performing automated functional testing on web
+applications. The tests are described in a simple test script. Along with the
+standard HTTP methods, Imprimatur handles authentication, file uploads and
+HTTPS. The responses are validated using regular expressions.
+ 
+Imprimatur runs on Python 2.7 and 3.4 on both CPython and PyPy.
+
+See the https://github.com/tlocke/imprimatur[GitHub repository] for code, bugs,
+feature requests etc.
+
+
+== Installation
+
+It's a good idea to set up a virtualenv:
+
+ virtualenv venv
+ . venv/bin/activate
+
+then install Imprimatur with pip:
+
+ pip install imprimatur
+
+
+== Upgrading from Java version
+
+There's a converter in the form of an XSL stylesheet which will transform the
+old style XML scripts to the new style Python ones. http://pythonhosted.org/imprimatur/convert.xsl[Download] the stylesheet and save it in the same directory
+as the the XML file. Edit your XML file to point to the stylesheet, so the
+first two lines of the XML document look like:
+
+ <?xml version="1.0" encoding="UTF-8"?>
+ <?xml-stylesheet type="text/xsl" href="convert.xsl"?>
+
+Also, remove any `<test-group>` elements and make sure all `<request>` elements
+are within `<test>` elements. Then open the XML file in a browser and copy and
+paste the page into a new file. The `name` attribute of `<imprimatur>` won't be
+carried over into the new file.
+
+
+== Quickstart
+
+To run an example test script save the following as a file called `test.py`:
+
+ [
+   {
+     'host': 'www.google.com',
+     'status_code': 200}] 
+
+then run it with:
+
+ imprimatur test.py
+
+and it should come back saying all tests are passed. Here's another script with
+some more examples:
+
+ [
+     {
+         'name': "Single regex",
+         'port': 5000,
+         'host': "localhost",
+         'path': "/text_2",
+         'status_code': 200,
+         'regexes': ['inexhaustible']},
+     {
+         'name': "Basic auth",
+         'path': "/auth",
+         'auth': ("conrad", "kurtz"),
+         'status_code': 200},
+     {
+         'name': "File upload",
+         'path': "/echo",
+         'method': "post",
+         'files': {"yellow": "tests/2/crome-file.txt"},
+         'regexes': ["yellow", "on the leads"],
+         'status_code': 200},
+     {
+         'name': "Post name and value with regex.",
+         'path': "/echo",
+         'method': "post",
+         'data': {"quote": "Leisure is the mother of philosophy."},
+         'status_code': 200,
+         'regexes': ["Leisure"]},
+     {
+         'name': "Repeat until successful.",
+         'path': "/counter",
+         # 'max' is maximum number of times to try
+         # 'period' is the number of seconds to wait between tries
+         'tries': {'max': 3, 'period': 1},
+         'status_code': 200,
+         'regexes': ["The Decline And Fall Of The Roman Empire"]},
+     {
+         'name': "Regex on header.",
+         'path': "/redirect?location=http://localhost:5000/here.html",
+         'status_code': 302,
+         'regexes': ["here.html"]},
+     {
+         'name': "HTTP HEAD request.",
+         'path': "/text_1",
+         'method': "head",
+         'status_code': 200}]
+
+
+== Reference
+
+The full list of properties for each request is given below. A * after the
+property name means that it is carried over to subsequent requests.
+
+|===
+| Name          | Notes
+
+| scheme*
+| Can be `'http'` (default) or `'https'`.
+
+| host*
+| Default is `'localhost'`.
+
+| port*
+| Default is `80`.
+
+| auth*
+| Sequence of username and password eg. `('conrad', 'kurtz')`
+
+| verify*
+| For an HTTPS request, verify the certificate. Can be `True` or `False`
+  (default).
+
+| name
+| Used to label the request.
+
+| path
+| End of the URL eg. `'/retrieve?product_id=45'`. Default is `'/'`.
+
+| method
+| An HTTP method. eg. `'post'`. Default is `'get'`.
+
+| data
+| Dictionary of post values eg. `{'id': 45, 'name': 'agnez'}`
+
+| files
+| File name and path to upload. Eg. `{'yellow': 'crome.txt'}`
+
+| tries
+| Maximum number of times to try the URL. Eg. `{'max': 5, 'period': 2}`. The
+  `max` value is the number of times to try, and the `period` is the number of
+  seconds to wait between tries. If `max` is omitted it defaults to `10` and if
+  `period` is omitted it defaults to `1`, so `{}` is equivalent to
+  `{'max': 10, 'period': 1}`.
+
+| regexes
+| Sequence of https://docs.python.org/3.4/howto/regex.html[regular expressions]
+  eg. `[r'go\s*ths', r'vandals']`
+
+| status_code
+| https://tools.ietf.org/html/rfc7231#section-6[HTTP status code] to
+  check for, eg. `200`
+|===
+
+
+== Web Interface
+
+Imprimatur comes with a very basic web interface. You can try it out using
+Imprimatur's built-in web server by doing:
+
+ python -m imprimatur.web
+
+Don't run it on a public facing production web server, as it is entirely
+unsecure.
+
+
+== Release Notes
+
+
+=== Version 0.23.15, 2015-05-20
+
+- Fixes a bug where if there's no body to a response, and it has to be printed
+  out, then fails.
+
+
+=== Version 0.23.14, 2015-02-19
+
+- Make sure `templates` directory is included in the distribution.
+
+
+=== Version 0.23.13, 2015-02-15
+
+- Added the `verify` flag for controlling whether to verify SSL certificates or
+  not. Can be `True` or `False`, the default is `False`.
+
+
+=== Version 0.23.11, 2015-02-10
+
+- Include 'templates' directory in the distribution, this is necessary for the
+  web server.
+
+- A list of runs is now shown on the home page.
+
+- Give a good error message if there's a syntax error in the script.
+
+- The wheel format distribution if Imprimatur now has the 'universal' flag set
+  which denotes that it runs on Python 2 and 3.
+
+
+=== Version 0.23.10, 2015-02-03
+
+- Fixed bug where regex pattern wasn't searching the headers.
+
+- Added the re.DOTALL flag so that a `.` in regular expressions matches line
+  ending characters.
+
+- Added a rudimentary web interface.
+
+
+=== Version 0.23.9, 2015-01-31
+
+- Various improvements to the converter from old style XML test scripts to new
+  style ones.
+
+- Renamed the '`tries`' attribute '`number`' to '`max`' as it's a better
+  description of what it does.
+
+- Fixed bug where Imprimatur always retried max times, even when a request was
+  successful.
+
+
+=== Version 0.23.8, 2015-01-26
+
+- The converter from old style XML test scripts to new style ones now carries
+  over the comments as well.
+
+
+=== Version 0.23.7, 2015-01-25
+
+- Added a converter to convert from old style XML test scripts to new style
+  Python ones.
+
+
+=== Version 0.23.5, 2015-01-22
+
+- The `status_code` attribute is now allowed to be either a `str` or an `int`.
+  Previously it could only be an `int`.
+
+- The '`Passed all tests!`' message at the end is now followed by a newline
+  character.
+
+- The `auth` attribute is now carried over from previous requests so that it
+  doesn't have to be specified explicitly in each subsequent request.
+
+
+=== Version 0.23.4, 2015-01-21
+
+- Imprimatur now requires version 2.5.1 of the '`requests`' library. It was
+  found that old versions of 'requests' didn't work.
+
+- Fixed a bug where the status code check isn't working.
+     
+- Added in a check for extraneous keys in the test script.
+ 
+- Included a lot more examples in the docs.
+
+
+=== Version 0.23.3, 2015-01-19
+
+- Fixed various problems with Python 3. 
+
+
+=== Version 0.23.2, 2015-01-18
+
+- Added make sure dependencies ('`flask`' and '`requests`') are automatically
+  installed.
+
+
+=== Version 0.23.1, 2015-01-18
+
+- Added `imprimatur` as a command-line script that is automatically installed.
+
+
+=== Version 0.23.0, 2015-01-17
+
+- Ported to Python.
+- Moved to GitHub.
+- Has the same features as before, but the script format is no longer an XML
+  file, but evaluatable Python.
+- Can be used as a Python library.
+
+
+=== Version 22
+
+- Removed <session> element.
+
+
+=== Version 20
+
+- Added support for HTTP HEAD requests.
+
+
+=== Version 18
+
+- Gets don't follow redirects by default.
+- Fixed example given in tests directory.
+- If no arguments are given on the command line, throws an exception saying no
+  file specified.
+
+
+=== Version 17
+
+- Can now set a request to follow redirects.
+
+
+=== Version 15
+
+- Changed so that a regex matches if it's found anywhere within the string.
+- In regexes, a dot character now matches line terminators as well.
