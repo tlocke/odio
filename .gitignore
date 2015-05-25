@@ -2,3 +2,7 @@
 *.pyc
 MANIFEST
 docs/index.html
+build/
+dist/
+odfio.egg-info/
+
