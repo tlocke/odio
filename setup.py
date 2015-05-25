@@ -45,6 +45,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     keywords="odf ods",
-    packages=("odfio",),
+    packages=("odfio","odfio.v1_1"),
     install_requires=['six'],
 )
