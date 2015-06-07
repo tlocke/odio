@@ -2,16 +2,16 @@
 
 import versioneer
 versioneer.VCS = 'git'
-versioneer.versionfile_source = 'odfio/_version.py'
-versioneer.versionfile_build = 'odfio/_version.py'
+versioneer.versionfile_source = 'odio/_version.py'
+versioneer.versionfile_build = 'odio/_version.py'
 versioneer.tag_prefix = ''
-versioneer.parentdir_prefix = 'odfio-'
+versioneer.parentdir_prefix = 'odio-'
 from setuptools import setup
 
 long_description = """\
 
-ODFIO
------
+Odio
+----
 
 A Python library for the input / output of
 http://en.wikipedia.org/wiki/OpenDocument[ODF] documents."""
@@ -21,14 +21,14 @@ cmdclass = dict(versioneer.get_cmdclass())
 version = versioneer.get_version()
 
 setup(
-    name="odfio",
+    name="odio",
     version=version,
     cmdclass=cmdclass,
     description="A library for the input / output of ODF documents",
     long_description=long_description,
     author="Tony Locke",
     author_email="tlocke@tlocke.org.uk",
-    url="https://github.com/tlocke/odfio",
+    url="https://github.com/tlocke/odio",
     license="MIT",
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -45,6 +45,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     keywords="odf ods",
-    packages=("odfio","odfio.v1_1"),
+    packages=("odio","odio.v1_1"),
     install_requires=['six'],
 )
