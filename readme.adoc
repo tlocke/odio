@@ -1,4 +1,4 @@
-= ODFIO
+= Odio
 
 A Python library for the input / output of
 http://en.wikipedia.org/wiki/OpenDocument[ODF] documents.
@@ -14,7 +14,7 @@ To run the regression tests, install http://testrun.org/tox/latest/[tox]:
  pip install tox
 
 
-then run `tox` from the `odfio` directory:
+then run `tox` from the `odio` directory:
 
  tox
 
@@ -31,7 +31,7 @@ Then type:
 
 and the doc will appear at `docs/index.html`.
 
-== Doing A Release Of ODFIO
+== Doing A Release Of Odio
 
 Run `tox` make sure all tests pass, then update the release notes in
 `docs/index.adoc` then do:

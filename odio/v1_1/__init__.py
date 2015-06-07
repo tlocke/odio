@@ -78,7 +78,7 @@ class OdsOut():
     xmlns:css3t="http://www.w3.org/TR/css3-text/"
     office:version="1.1">
 </office:document-styles>""")
-        self.dom = xml.dom.minidom.parseString(
+        self.doc = xml.dom.minidom.parseString(
             """<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
@@ -107,34 +107,67 @@ class OdsOut():
     xmlns:css3t="http://www.w3.org/TR/css3-text/"
     office:version="1.1">
   <office:scripts/>
-  <office:automatic-styles/>
+  <office:automatic-styles>
+    <number:date-style style:name="date">
+      <number:year number:style="long"/>
+      <number:text>-</number:text>
+      <number:month number:style="long"/>
+      <number:text>-</number:text>
+      <number:day number:style="long"/>
+      <number:text> </number:text>
+      <number:hours number:style="long"/>
+      <number:text>:</number:text>
+      <number:minutes number:style="long"/>
+    </number:date-style>
+    <style:style style:name="cell_date" style:family="table-cell"
+      style:parent-style-name="Default" style:data-style-name="date"/>
+  </office:automatic-styles>
   <office:body>
     <office:spreadsheet>
-      <table:table table:name="Plan">
-        <table:table-column/>
-        <table:table-row>
-          <table:table-cell office:string-value="veni, vidi, vici"
-              office:value-type="string"/>
-          <table:table-cell office:value-type="float" office:value="0.3"/>
-          <table:table-cell office:value-type="float" office:value="5"/>
-          <table:table-cell office:value-type="date"
-              office:date-value="2015-06-30T16:38:00"/>
-        </table:table-row>
-      </table:table>
-      <table:named-expressions/>
     </office:spreadsheet>
   </office:body>
 </office:document-content>""")
+        self.spreadsheet_elem = self.doc.getElementsByTagName(
+            'office:spreadsheet')[0]
 
-    def writerow(*vals):
-        for val in vals:
-            if isinstance(val, datetime.datetime):
-                pass
+    def append_table(self, name):
+        table_elem = self.spreadsheet_elem.appendChild(
+            self.doc.createElement('table:table'))
+        table_elem.setAttribute('table:name', name)
+        table_elem.appendChild(self.doc.createElement('table:table-column'))
+        return Table(self.doc, table_elem)
 
     def close(self):
-        self.z.writestr('content.xml', self.dom.toprettyxml(encoding='utf-8'))
+        self.z.writestr('content.xml', self.doc.toprettyxml(encoding='utf-8'))
         self.z.close()
         self.f.close()
 
+    def __enter__(self):
+        return self
+
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
+
+
+class Table():
+    def __init__(self, doc, table_elem):
+        self.doc = doc
+        self.table_elem = table_elem
+
+    def append_row(self, vals):
+        row_elem = self.table_elem.appendChild(
+            self.doc.createElement('table:table-row'))
+        for val in vals:
+            cell_elem = row_elem.appendChild(
+                self.doc.createElement('table:table-cell'))
+            if isinstance(val, datetime.datetime):
+                cell_elem.setAttribute('office:value-type', 'date')
+                cell_elem.setAttribute(
+                    'office:date-value', val.strftime('%Y-%m-%dT%H:%M:%S'))
+                cell_elem.setAttribute('table:style-name', 'cell_date')
+            elif isinstance(val, str):
+                cell_elem.setAttribute('office:value-type', 'string')
+                cell_elem.setAttribute('office:string-value', val)
+            elif isinstance(val, (float, int)):
+                cell_elem.setAttribute('office:value-type', 'float')
+                cell_elem.setAttribute('office:value', str(val))
