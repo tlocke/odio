@@ -16,10 +16,13 @@ def test_writerow(tmpdir):
     with zipfile.ZipFile(str(fname)) as z:
         z.extractall(str(actual_dir))
 
+    '''
     desired_dir = tmpdir.mkdir('desired')
     desired_name = os.path.join(os.path.dirname(__file__), 'test.ods')
     with zipfile.ZipFile(desired_name) as z:
         z.extractall(str(desired_dir))
+    '''
+    desired_dir = os.path.join(os.path.dirname(__file__), 'unpacked')
 
     actual_walk = list(os.walk(str(actual_dir)))
     t_actual_walk = list(
