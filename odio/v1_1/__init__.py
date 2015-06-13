@@ -3,7 +3,7 @@ import datetime
 import zipfile
 
 
-class OdsOut():
+class Spreadsheet():
     def __init__(self, f):
         self.f = f
         self.z = zipfile.ZipFile(f, 'w')

@@ -1,4 +1,4 @@
-from odio.v1_2 import OdsOut
+from odio.v1_2 import Spreadsheet
 import datetime
 import zipfile
 import os
@@ -6,8 +6,8 @@ import os
 
 def test_writerow(tmpdir):
     fname = tmpdir.join('actual.ods')
-    with OdsOut(open(str(fname), "wb")) as out:
-        table = out.append_table('Plan')
+    with Spreadsheet(open(str(fname), "wb")) as sheet:
+        table = sheet.append_table('Plan')
         table.append_row(
             "veni, vidi, vici", 0.3, 5, datetime.datetime(2015, 6, 30, 16, 38))
     actual_dir = tmpdir.mkdir('actual')

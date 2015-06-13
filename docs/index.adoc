@@ -34,10 +34,10 @@ Create an ODF 1.1 spreadsheet...
 >>> import datetime
 >>>
 >>> # Create the spreadsheet
->>> with odio.v1_1.OdsOut(open('test.ods', "wb")) as out:
+>>> with odio.v1_1.Spreadsheet(open('test.ods', "wb")) as sheet:
 ...	
-...	# Add a tab to the spreadsheet
-... 	table = out.append_table('Plan')
+...	# Add a table (tab) to the spreadsheet
+... 	table = sheet.append_table('Plan')
 ...	
 ...	# Add a row to  the table
 ...     table.append_row(
@@ -52,10 +52,10 @@ Create an ODF 1.2 spreadsheet...
 >>> import datetime
 >>>
 >>> # Create the spreadsheet
->>> with odio.v1_2.OdsOut(open('test.ods', "wb")) as out:
+>>> with odio.v1_2.Spreadsheet(open('test.ods', "wb")) as sheet:
 ...	
-...	# Add a tab to the spreadsheet
-... 	table = out.append_table('Plan')
+...	# Add a table (tab) to the spreadsheet
+... 	table = sheet.append_table('Plan')
 ...	
 ...	# Add a row to  the table
 ...     table.append_row(
@@ -65,6 +65,11 @@ Create an ODF 1.2 spreadsheet...
 
 
 == Release Notes
+
+
+=== Version 0.0.4, 2015-06-13
+
+- Renamed OdsOut to Spreadsheet to make things more intuitive.
 
 
 === Version 0.0.3, 2015-06-13
