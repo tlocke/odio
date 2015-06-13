@@ -35,11 +35,12 @@ class OdsOut():
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
     xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2"
-    office:version="1.1">
+    office:version="1.2">
   <office:meta>
-      <meta:generator>ODFIO</meta:generator>
+      <meta:generator>Odio</meta:generator>
   </office:meta>
-</office:document-meta>""")
+</office:document-meta>
+""")
 
         self.z.writestr(
             'settings.xml',
@@ -49,8 +50,9 @@ class OdsOut():
     xmlns:xlink="http://www.w3.org/1999/xlink"
     xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
     xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2"
-    office:version="1.1">
-</office:document-settings>""")
+    office:version="1.2">
+</office:document-settings>
+""")
 
         self.z.writestr(
             'styles.xml', """<?xml version="1.0" encoding="UTF-8"?>
@@ -105,7 +107,7 @@ class OdsOut():
     xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:css3t="http://www.w3.org/TR/css3-text/"
-    office:version="1.1">
+    office:version="1.2">
   <office:scripts/>
   <office:automatic-styles>
     <number:date-style style:name="date">

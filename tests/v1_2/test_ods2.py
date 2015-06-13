@@ -1,4 +1,4 @@
-from odio.v1_1 import OdsOut
+from odio.v1_2 import OdsOut
 import datetime
 import zipfile
 import os
@@ -14,12 +14,6 @@ def test_writerow(tmpdir):
     with zipfile.ZipFile(str(fname)) as z:
         z.extractall(str(actual_dir))
 
-    '''
-    desired_dir = tmpdir.mkdir('desired')
-    desired_name = os.path.join(os.path.dirname(__file__), 'test.ods')
-    with zipfile.ZipFile(desired_name) as z:
-        z.extractall(str(desired_dir))
-    '''
     desired_dir = os.path.join(os.path.dirname(__file__), 'unpacked')
 
     actual_walk = list(os.walk(str(actual_dir)))
@@ -38,4 +32,7 @@ def test_writerow(tmpdir):
             desired_fl = desired_fls[j]
             actual_f = open(os.path.join(actual_pth, actual_fl))
             desired_f = open(os.path.join(desired_pth, desired_fl))
-            assert ''.join(actual_f) == ''.join(desired_f)
+            ac = ''.join(actual_f)
+            de = ''.join(desired_f)
+            print(ac, de)
+            assert ac == de

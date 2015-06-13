@@ -13,8 +13,7 @@ long_description = """\
 Odio
 ----
 
-A Python library for the input / output of
-http://en.wikipedia.org/wiki/OpenDocument[ODF] documents."""
+A Python library for the input / output of ODF documents."""
 
 cmdclass = dict(versioneer.get_cmdclass())
 
@@ -45,6 +44,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     keywords="odf ods",
-    packages=("odio","odio.v1_1"),
+    packages=("odio", "odio.v1_1", "odio.v1_2"),
     install_requires=['six'],
 )
