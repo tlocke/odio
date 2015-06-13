@@ -3,8 +3,8 @@
 A Python library for the input / output of
 http://en.wikipedia.org/wiki/OpenDocument[ODF] documents.
 
-* http://pythonhosted.org/odfio/[User documentation]
-* https://github.com/tlocke/odfio[Contribute on GitHub]
+* http://pythonhosted.org/odio/[User documentation]
+* https://github.com/tlocke/odio[Contribute on GitHub]
 * Licensed under the http://opensource.org/licenses/MIT[MIT Licence].
 
 == Regression Tests

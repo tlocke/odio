@@ -67,6 +67,11 @@ Create an ODF 1.2 spreadsheet...
 == Release Notes
 
 
+=== Version 0.0.5, 2015-06-13
+
+- Fixed links on readme file.
+
+
 === Version 0.0.4, 2015-06-13
 
 - Renamed OdsOut to Spreadsheet to make things more intuitive.

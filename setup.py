@@ -8,13 +8,6 @@ versioneer.tag_prefix = ''
 versioneer.parentdir_prefix = 'odio-'
 from setuptools import setup
 
-long_description = """\
-
-Odio
-----
-
-A Python library for the input / output of ODF documents."""
-
 cmdclass = dict(versioneer.get_cmdclass())
 
 version = versioneer.get_version()
@@ -23,8 +16,7 @@ setup(
     name="odio",
     version=version,
     cmdclass=cmdclass,
-    description="A library for the input / output of ODF documents",
-    long_description=long_description,
+    description="A library for the input / output of ODF documents.",
     author="Tony Locke",
     author_email="tlocke@tlocke.org.uk",
     url="https://github.com/tlocke/odio",
