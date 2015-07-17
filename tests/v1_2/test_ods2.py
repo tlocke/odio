@@ -1,4 +1,4 @@
-from odio.v1_2 import SpreadsheetWriter, SpreadsheetReader
+import odio
 import datetime
 import zipfile
 import os
@@ -8,9 +8,9 @@ def test_write_read_row(tmpdir):
     TABLE_NAME = 'Plan'
     ROW = ["veni, vidi, vici", 0.3, 5, datetime.datetime(2015, 6, 30, 16, 38)]
     fname = tmpdir.join('actual.ods')
-    with SpreadsheetWriter(open(str(fname), "wb")) as sheet:
+    with odio.create_spreadsheet(open(str(fname), "wb"), '1.2') as sheet:
         table = sheet.append_table(TABLE_NAME)
-        table.append_row(*ROW)
+        table.append_row(ROW)
     actual_dir = tmpdir.mkdir('actual')
     with zipfile.ZipFile(str(fname)) as z:
         z.extractall(str(actual_dir))
@@ -37,7 +37,7 @@ def test_write_read_row(tmpdir):
             de = ''.join(desired_f)
             assert ac == de
 
-    sheet = SpreadsheetReader(open(str(fname), 'rb'))
+    sheet = odio.read_spreadsheet(open(str(fname), 'rb'))
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
     assert table.rows[0] == ROW

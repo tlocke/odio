@@ -156,7 +156,7 @@ class TableWriter():
         self.doc = doc
         self.table_elem = table_elem
 
-    def append_row(self, *vals):
+    def append_row(self, vals):
         row_elem = self.table_elem.appendChild(
             self.doc.createElement('table:table-row'))
         for val in vals:
@@ -173,21 +173,15 @@ class TableWriter():
             elif isinstance(val, (float, int)):
                 cell_elem.setAttribute('office:value-type', 'float')
                 cell_elem.setAttribute('office:value', str(val))
+            else:
+                raise Exception("Type of '" + str(val) + "' not recognized.")
 
 
 class SpreadsheetReader():
-    def __init__(self, f):
-        z = zipfile.ZipFile(f, 'r')
+    def __init__(self, spreadsheet_elem):
         self.tables = []
-
-        content = z.read('content.xml')
-        dom = xml.dom.minidom.parseString(content)
-        spreadsheet_elem = dom.getElementsByTagName('office:spreadsheet')[0]
         for table_elem in spreadsheet_elem.getElementsByTagName('table:table'):
             self.tables.append(TableReader(table_elem))
-
-        z.close()
-        f.close()
 
 
 class TableReader():
