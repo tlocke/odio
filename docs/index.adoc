@@ -27,14 +27,18 @@ then install Odio with pip:
 
 == Quickstart
 
-Create an ODF 1.1 spreadsheet...
+=== ODF 1.2
+
+Create a spreadsheet:
 
 ....
->>> import odio.v1_1
+>>> import odio.v1_2
 >>> import datetime
+>>> 
+>>>
 >>>
 >>> # Create the spreadsheet
->>> with odio.v1_1.Spreadsheet(open('test.ods', "wb")) as sheet:
+>>> with odio.v1_2.SpreadsheetWriter(open('test.ods', "wb")) as sheet:
 ...	
 ...	# Add a table (tab) to the spreadsheet
 ... 	table = sheet.append_table('Plan')
@@ -45,14 +49,34 @@ Create an ODF 1.1 spreadsheet...
 
 ....
 
-Create an ODF 1.2 spreadsheet...
+Parse a spreadsheet:
 
 ....
 >>> import odio.v1_2
 >>> import datetime
 >>>
+>>> # Open the spreadsheet
+>>> sheet = odio.v1_2.SpreadsheetReader(open('test.ods', "rb"))
+>>> table = sheet.tables[0]
+>>> print(table.name)
+Plan
+>>> for row in table.rows:
+...     print(row)
+['veni, vidi, vici', 0.3, 5.0, datetime.datetime(2015, 6, 30, 16, 38)]
+
+....
+
+
+=== ODF 1.1
+
+Create a spreadsheet:
+
+....
+>>> import odio.v1_1
+>>> import datetime
+>>>
 >>> # Create the spreadsheet
->>> with odio.v1_2.Spreadsheet(open('test.ods', "wb")) as sheet:
+>>> with odio.v1_1.Spreadsheet(open('test.ods', "wb")) as sheet:
 ...	
 ...	# Add a table (tab) to the spreadsheet
 ... 	table = sheet.append_table('Plan')

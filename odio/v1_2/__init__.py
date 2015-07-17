@@ -3,7 +3,7 @@ import datetime
 import zipfile
 
 
-class Spreadsheet():
+class SpreadsheetWriter():
     def __init__(self, f):
         self.f = f
         self.z = zipfile.ZipFile(f, 'w')
@@ -137,7 +137,7 @@ class Spreadsheet():
             self.doc.createElement('table:table'))
         table_elem.setAttribute('table:name', name)
         table_elem.appendChild(self.doc.createElement('table:table-column'))
-        return Table(self.doc, table_elem)
+        return TableWriter(self.doc, table_elem)
 
     def close(self):
         self.z.writestr('content.xml', self.doc.toprettyxml(encoding='utf-8'))
@@ -151,7 +151,7 @@ class Spreadsheet():
         self.close()
 
 
-class Table():
+class TableWriter():
     def __init__(self, doc, table_elem):
         self.doc = doc
         self.table_elem = table_elem
@@ -173,3 +173,38 @@ class Table():
             elif isinstance(val, (float, int)):
                 cell_elem.setAttribute('office:value-type', 'float')
                 cell_elem.setAttribute('office:value', str(val))
+
+
+class SpreadsheetReader():
+    def __init__(self, f):
+        z = zipfile.ZipFile(f, 'r')
+        self.tables = []
+
+        content = z.read('content.xml')
+        dom = xml.dom.minidom.parseString(content)
+        spreadsheet_elem = dom.getElementsByTagName('office:spreadsheet')[0]
+        for table_elem in spreadsheet_elem.getElementsByTagName('table:table'):
+            self.tables.append(TableReader(table_elem))
+
+        z.close()
+        f.close()
+
+
+class TableReader():
+    def __init__(self, table_elem):
+        self.name = table_elem.getAttribute('table:name')
+        self.rows = []
+        for row_elem in table_elem.getElementsByTagName('table:table-row'):
+            row = []
+            self.rows.append(row)
+            for cell_elem in row_elem.getElementsByTagName('table:table-cell'):
+                val_type = cell_elem.getAttribute('office:value-type')
+                if val_type == 'date':
+                    row.append(
+                        datetime.datetime.strptime(
+                            cell_elem.getAttribute('office:date-value'),
+                            '%Y-%m-%dT%H:%M:%S'))
+                elif val_type == 'string':
+                    row.append(cell_elem.getAttribute('office:string-value'))
+                elif val_type == 'float':
+                    row.append(float(cell_elem.getAttribute('office:value')))
