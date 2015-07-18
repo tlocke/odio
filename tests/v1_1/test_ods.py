@@ -35,7 +35,7 @@ def test_writerow(tmpdir):
             desired_f = open(os.path.join(desired_pth, desired_fl))
             assert ''.join(actual_f) == ''.join(desired_f)
 
-    sheet = odio.read_spreadsheet(open(str(fname), 'rb'))
+    sheet = odio.parse_spreadsheet(open(str(fname), 'rb'))
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
     assert table.rows[0] == ROW

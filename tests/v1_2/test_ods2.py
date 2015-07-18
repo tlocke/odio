@@ -4,7 +4,7 @@ import zipfile
 import os
 
 
-def test_write_read_row(tmpdir):
+def test_create_parse_spreadsheet(tmpdir):
     TABLE_NAME = 'Plan'
     ROW = ["veni, vidi, vici", 0.3, 5, datetime.datetime(2015, 6, 30, 16, 38)]
     fname = tmpdir.join('actual.ods')
@@ -37,7 +37,7 @@ def test_write_read_row(tmpdir):
             de = ''.join(desired_f)
             assert ac == de
 
-    sheet = odio.read_spreadsheet(open(str(fname), 'rb'))
+    sheet = odio.parse_spreadsheet(open(str(fname), 'rb'))
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
     assert table.rows[0] == ROW

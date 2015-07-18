@@ -20,7 +20,7 @@ def create_spreadsheet(f, version='1.2'):
             "and '1.2'.")
 
 
-def read_spreadsheet(f):
+def parse_spreadsheet(f):
     with zipfile.ZipFile(f, 'r') as z:
         content = z.read('content.xml')
     f.close()

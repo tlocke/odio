@@ -34,7 +34,6 @@ Create a spreadsheet:
 >>> import datetime
 >>> 
 >>>
->>>
 >>> # Create the spreadsheet. The ODF version string can be '1.2' or '1.1'
 >>> with odio.create_spreadsheet(open('test.ods', "wb"), '1.2') as sheet:
 ...	
@@ -52,10 +51,10 @@ Parse a spreadsheet:
 
 ....
 >>> import odio
->>> import datetime
+>>>
 >>>
 >>> # Open the spreadsheet we just created. Can be ODF 1.1 or 1.2 format.
->>> sheet = odio.read_spreadsheet(open('test.ods', "rb"))
+>>> sheet = odio.parse_spreadsheet(open('test.ods', "rb"))
 >>> table = sheet.tables[0]
 >>> print(table.name)
 Plan
