@@ -6,7 +6,9 @@ import os
 
 def test_create_parse_spreadsheet(tmpdir):
     TABLE_NAME = 'Plan'
-    ROW = ["veni, vidi, vici", 0.3, 5, datetime.datetime(2015, 6, 30, 16, 38)]
+    ROW = [
+        "veni, vidi, vici", 0.3, 5, odio.Formula('=B1 + C1'),
+        datetime.datetime(2015, 6, 30, 16, 38)]
     fname = tmpdir.join('actual.ods')
     with odio.create_spreadsheet(open(str(fname), "wb"), '1.2') as sheet:
         table = sheet.append_table(TABLE_NAME)
@@ -35,9 +37,12 @@ def test_create_parse_spreadsheet(tmpdir):
             desired_f = open(os.path.join(desired_pth, desired_fl))
             ac = ''.join(actual_f)
             de = ''.join(desired_f)
+            print(ac, de)
             assert ac == de
 
     sheet = odio.parse_spreadsheet(open(str(fname), 'rb'))
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
+    print(type(table.rows[0][3].formula), type(ROW[3].formula))
+    print(table.rows[0], ROW)
     assert table.rows[0] == ROW

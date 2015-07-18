@@ -37,3 +37,17 @@ def parse_spreadsheet(f):
             "The version '" + str(version) +
             "' isn't recognized. The valid version strings are '1.1' "
             "and '1.2'.")
+
+
+class Formula():
+    def __init__(self, formula):
+        self.formula = formula
+
+    def __repr__(self):
+        return "odio.Formula('" + self.formula + "')"
+
+    def __str__(self):
+        return self.formula
+
+    def __eq__(self, other):
+        return isinstance(other, Formula) and self.formula == other.formula

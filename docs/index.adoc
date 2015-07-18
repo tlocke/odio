@@ -42,7 +42,8 @@ Create a spreadsheet:
 ...	
 ...	# Add a row to  the table
 ...     row = [
-...         "veni, vidi, vici", 0.3, 5, datetime.datetime(2015, 6, 30, 16, 38)]
+...         "veni, vidi, vici", 0.3, 5, odio.Formula('=B1 + C1'),
+...         datetime.datetime(2015, 6, 30, 16, 38)]
 ...     table.append_row(row)
 
 ....
@@ -60,7 +61,7 @@ Parse a spreadsheet:
 Plan
 >>> for row in table.rows:
 ...     print(row)
-['veni, vidi, vici', 0.3, 5.0, datetime.datetime(2015, 6, 30, 16, 38)]
+['veni, vidi, vici', 0.3, 5.0, odio.Formula('=B1 + C1'), datetime.datetime(2015, 6, 30, 16, 38)]
 
 ....
 

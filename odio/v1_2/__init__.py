@@ -1,6 +1,7 @@
 import xml.dom.minidom
 import datetime
 import zipfile
+import odio
 
 
 class SpreadsheetWriter():
@@ -13,6 +14,7 @@ class SpreadsheetWriter():
             'META-INF/manifest.xml',
             """<?xml version="1.0" encoding="UTF-8"?>
 <manifest:manifest
+    manifest:version="1.2"
     xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
   <manifest:file-entry
       manifest:full-path="/"
@@ -25,7 +27,8 @@ class SpreadsheetWriter():
       manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
   <manifest:file-entry
       manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
-</manifest:manifest>""")
+</manifest:manifest>
+""")
         self.z.writestr(
             'meta.xml',
             """<?xml version="1.0" encoding="UTF-8"?>
@@ -78,8 +81,9 @@ class SpreadsheetWriter():
     xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:css3t="http://www.w3.org/TR/css3-text/"
-    office:version="1.1">
-</office:document-styles>""")
+    office:version="1.2">
+</office:document-styles>
+""")
         self.doc = xml.dom.minidom.parseString(
             """<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content
@@ -173,6 +177,8 @@ class TableWriter():
             elif isinstance(val, (float, int)):
                 cell_elem.setAttribute('office:value-type', 'float')
                 cell_elem.setAttribute('office:value', str(val))
+            elif isinstance(val, odio.Formula):
+                cell_elem.setAttribute('table:formula', 'of:' + str(val))
             else:
                 raise Exception("Type of '" + str(val) + "' not recognized.")
 
@@ -192,13 +198,20 @@ class TableReader():
             row = []
             self.rows.append(row)
             for cell_elem in row_elem.getElementsByTagName('table:table-cell'):
-                val_type = cell_elem.getAttribute('office:value-type')
-                if val_type == 'date':
-                    row.append(
-                        datetime.datetime.strptime(
-                            cell_elem.getAttribute('office:date-value'),
-                            '%Y-%m-%dT%H:%M:%S'))
-                elif val_type == 'string':
-                    row.append(cell_elem.getAttribute('office:string-value'))
-                elif val_type == 'float':
-                    row.append(float(cell_elem.getAttribute('office:value')))
+                if cell_elem.hasAttribute('table:formula'):
+                    formula = cell_elem.getAttribute('table:formula')
+                    eq_idx = formula.index('=')
+                    row.append(odio.Formula(formula[eq_idx:]))
+                else:
+                    val_type = cell_elem.getAttribute('office:value-type')
+                    if val_type == 'date':
+                        row.append(
+                            datetime.datetime.strptime(
+                                cell_elem.getAttribute('office:date-value'),
+                                '%Y-%m-%dT%H:%M:%S'))
+                    elif val_type == 'string':
+                        row.append(
+                            cell_elem.getAttribute('office:string-value'))
+                    elif val_type == 'float':
+                        row.append(
+                            float(cell_elem.getAttribute('office:value')))
