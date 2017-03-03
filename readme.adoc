@@ -1,11 +1,146 @@
 = Odio
 
-A Python library for the input / output of
-http://en.wikipedia.org/wiki/OpenDocument[ODF] documents.
+A pure-Python library for the input / output of
+http://en.wikipedia.org/wiki/OpenDocument[ODF] documents. Licensed under the
+http://opensource.org/licenses/MIT[MIT Licence]. Odio runs on Python 2.7 and
+3.5 on both CPython and PyPy and supports ODF 1.1 and 1.2.
 
-* http://pythonhosted.org/odio/[User documentation]
-* https://github.com/tlocke/odio[Contribute on GitHub]
-* Licensed under the http://opensource.org/licenses/MIT[MIT Licence].
+
+== Installation
+
+It's a good idea to set up a virtualenv:
+
+ virtualenv venv
+ source venv/bin/activate
+
+then install Odio with pip:
+
+ pip install odio
+
+
+== Quickstart
+
+Create a spreadsheet:
+
+....
+>>> import odio
+>>> import datetime
+>>> 
+>>>
+>>> # Create the spreadsheet. The ODF version string can be '1.2' or '1.1'
+>>> with odio.create_spreadsheet(open('test.ods', "wb"), '1.2') as sheet:
+...	
+...	# Add a table (tab) to the spreadsheet
+... 	table = sheet.append_table('Plan')
+...	
+...	# Add a row to  the table
+...     row = [
+...         "veni, vidi, vici", 0.3, 5, odio.Formula('=B1 + C1'),
+...         datetime.datetime(2015, 6, 30, 16, 38)]
+...     table.append_row(row)
+
+....
+
+parse the spreadsheet:
+
+....
+>>> import odio
+>>>
+>>>
+>>> # Parse the document we just created. Can be ODF 1.1 or 1.2 format.
+>>> sheet = odio.parse_spreadsheet(open('test.ods', "rb"))
+>>>
+>>> table = sheet.tables[0]
+>>> print(table.name)
+Plan
+>>> for row in table.rows:
+...     print(row)
+['veni, vidi, vici', 0.3, 5.0, odio.Formula('=B1 + C1'), datetime.datetime(2015, 6, 30, 16, 38)]
+
+....
+
+
+Create a text document:
+
+....
+>>> from odio import create_text, P, H, Span
+>>> 
+>>>
+>>> # Create the text document. The ODF version string can be '1.2' or '1.1'
+>>> with odio.create_text(open('test.odt', "wb"), '1.2') as txt:
+...	
+...     txt.append(
+...         P("The Meditations", text_style_name='Title'),
+...         H("Book One", text_style_name='Heading 1'),
+...         P(
+...             "From my grandfather ",
+...             Span("Verus", text_style_name='Strong Emphasis'),
+...             " I learned good morals and the government of my temper."),
+...         P(
+...             "From the reputation and remembrance of my father, "
+...             "modesty and a ", Span("manly", text_style_name='Emphasis'),
+...             " character."))
+
+....
+
+parse the text document:
+
+....
+>>> import odio
+>>>
+>>>
+>>> # Parse the text document we just created. Can be ODF 1.1 or 1.2 format.
+>>> txt = odio.parse_text(open('test.odt', "rb"))
+>>> 
+>>> # Find a subnode
+>>> subnode = txt.nodes[2] 
+>>> print(subnode.name)
+text:p
+>>> print(subnode.attributes['text_style_name'])
+Text Body
+>>> print(subnode)
+odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Emphasis'), ' I learned good morals and the government of my temper. ')
+
+....
+
+
+== Release Notes
+
+
+=== Version 0.0.7, 2015-07-17
+
+- Can now read ODS spreadsheets. See Quickstart section for details.
+- The `append_row()` method now accepts a single sequence type, rather than an
+  arbitrary number of positional parameters.
+- API changed so that only the top level `odio` package needs to be
+  imported. The `create_spreadsheet()` function is new, and accepts an ODF
+  version string ('1.1', '1.2').
+
+
+=== Version 0.0.5, 2015-06-13
+
+- Fixed links on readme file.
+
+
+=== Version 0.0.4, 2015-06-13
+
+- Renamed OdsOut to Spreadsheet to make things more intuitive.
+
+
+=== Version 0.0.3, 2015-06-13
+
+- Added support for ODF 1.2.
+
+
+=== Version 0.0.1, 2015-05-25
+
+- Make wheel setting 'universal'.
+
+
+=== Version 0.0.0, 2015-05-25
+
+- Initial release, nothing to see yet.
+
 
 == Regression Tests
 
@@ -19,23 +154,9 @@ then run `tox` from the `odio` directory:
  tox
 
 
-== Building The Documentation
-
-The docs are written using Asciidoctor. To build them, install asciidoctor:
-
- apt-get install asciidoctor
-
-Then type:
-
- asciidoctor docs/index.adoc
-
-and the doc will appear at `docs/index.html`.
-
 == Doing A Release Of Odio
 
-Run `tox` make sure all tests pass, then update the release notes in
-`docs/index.adoc` then do:
+Run `tox` make sure all tests pass, then update the release notes and then do:
 
- asciidoctor docs/index.adoc
  git tag -a x.y.z -m "Version x.y.z"
  python setup.py register sdist bdist_wheel upload upload_docs
