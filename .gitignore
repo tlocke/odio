@@ -6,3 +6,4 @@ build/
 dist/
 odio.egg-info/
 test.ods
+test.odt

@@ -4,9 +4,13 @@ import zipfile
 
 
 class SpreadsheetWriter():
-    def __init__(self, f):
+    def __init__(self, f, compressed):
         self.f = f
-        self.z = zipfile.ZipFile(f, 'w')
+        if compressed:
+            compression = zipfile.ZIP_DEFLATED
+        else:
+            compression = zipfile.ZIP_STORED
+        self.z = zipfile.ZipFile(f, 'w', compression)
         self.z.writestr(
             'mimetype', 'application/vnd.oasis.opendocument.spreadsheet')
         self.z.writestr(

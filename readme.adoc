@@ -1,6 +1,6 @@
 = Odio
 
-A pure-Python library for the input / output of
+A pure-Python library for the import / output of
 http://en.wikipedia.org/wiki/OpenDocument[ODF] documents. Licensed under the
 http://opensource.org/licenses/MIT[MIT Licence]. Odio runs on Python 2.7 and
 3.5 on both CPython and PyPy and supports ODF 1.1 and 1.2.
@@ -27,8 +27,10 @@ Create a spreadsheet:
 >>> import datetime
 >>> 
 >>>
->>> # Create the spreadsheet. The ODF version string can be '1.2' or '1.1'
->>> with odio.create_spreadsheet(open('test.ods', "wb"), '1.2') as sheet:
+>>> # Create the spreadsheet.
+>>> # Version is ODF version. Can be '1.1' or '1.2'. The default is '1.2'.
+>>> # Default for 'compressed' is True.
+>>> with odio.create_spreadsheet(open('test.ods', "wb"), version='1.2', compressed=True) as sheet:
 ...	
 ...	# Add a table (tab) to the spreadsheet
 ... 	table = sheet.append_table('Plan')
@@ -41,13 +43,14 @@ Create a spreadsheet:
 
 ....
 
-parse the spreadsheet:
+import the spreadsheet:
 
 ....
 >>> import odio
 >>>
 >>>
->>> # Parse the document we just created. Can be ODF 1.1 or 1.2 format.
+>>> # Parse the document we just created.
+>>> # Version is ODF version. Can be '1.1' or '1.2'. The default is '1.2'.
 >>> sheet = odio.parse_spreadsheet(open('test.ods', "rb"))
 >>>
 >>> table = sheet.tables[0]
@@ -67,7 +70,7 @@ Create a text document:
 >>> 
 >>>
 >>> # Create the text document. The ODF version string can be '1.2' or '1.1'
->>> with odio.create_text(open('test.odt', "wb"), '1.2') as txt:
+>>> with create_text(open('test.odt', "wb"), '1.2') as txt:
 ...	
 ...     txt.append(
 ...         P("The Meditations", text_style_name='Title'),
@@ -105,6 +108,17 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 
 
 == Release Notes
+
+=== Version 0.0.9, 2017-03-03
+
+- Passes tests with Python 3.5.
+- Can now export uncompressed spreadsheets.
+
+
+=== Version 0.0.8, 2015-08-02
+
+- Change `read_spreadsheet` to `parse_spreadsheet`.
+- Add support for formulas.
 
 
 === Version 0.0.7, 2015-07-17

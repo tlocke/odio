@@ -9,11 +9,11 @@ __version__ = get_versions()['version']
 del get_versions
 
 
-def create_spreadsheet(f, version='1.2'):
+def create_spreadsheet(f, version='1.2', compressed=True):
     if version == '1.1':
-        return odio.v1_1.SpreadsheetWriter(f)
+        return odio.v1_1.SpreadsheetWriter(f, compressed)
     elif version == '1.2':
-        return odio.v1_2.SpreadsheetWriter(f)
+        return odio.v1_2.SpreadsheetWriter(f, compressed)
     else:
         raise Exception(
             "The version '" + str(version) +
@@ -83,5 +83,6 @@ def parse_text(f):
             "The version '" + str(version) +
             "' isn't recognized. The valid version strings are '1.1' "
             "and '1.2'.")
+
 
 __all__ = [H, P, Span]
