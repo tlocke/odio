@@ -1,9 +1,12 @@
 import xml.dom.minidom
 from xml.dom import Node
-import datetime
+from datetime import datetime as Datetime
 import zipfile
 import odio
 from odio.common import P, H, Span
+
+
+OFFICE_VALUE_TYPE = 'office:value-type'
 
 
 class SpreadsheetWriter():
@@ -172,7 +175,7 @@ class TableWriter():
         for val in vals:
             cell_elem = row_elem.appendChild(
                 self.doc.createElement('table:table-cell'))
-            if isinstance(val, datetime.datetime):
+            if isinstance(val, Datetime):
                 cell_elem.setAttribute('office:value-type', 'date')
                 cell_elem.setAttribute(
                     'office:date-value', val.strftime('%Y-%m-%dT%H:%M:%S'))
@@ -185,6 +188,8 @@ class TableWriter():
                 cell_elem.setAttribute('office:value', str(val))
             elif isinstance(val, odio.Formula):
                 cell_elem.setAttribute('table:formula', 'of:' + str(val))
+            elif val is None:
+                pass
             else:
                 raise Exception("Type of '" + str(val) + "' not recognized.")
 
@@ -207,20 +212,20 @@ class TableReader():
                 if cell_elem.hasAttribute('table:formula'):
                     formula = cell_elem.getAttribute('table:formula')
                     eq_idx = formula.index('=')
-                    row.append(odio.Formula(formula[eq_idx:]))
-                else:
-                    val_type = cell_elem.getAttribute('office:value-type')
+                    val = odio.Formula(formula[eq_idx:])
+                elif cell_elem.hasAttribute(OFFICE_VALUE_TYPE):
+                    val_type = cell_elem.getAttribute(OFFICE_VALUE_TYPE)
                     if val_type == 'date':
-                        row.append(
-                            datetime.datetime.strptime(
-                                cell_elem.getAttribute('office:date-value'),
-                                '%Y-%m-%dT%H:%M:%S'))
+                        val = Datetime.strptime(
+                            cell_elem.getAttribute('office:date-value'),
+                            '%Y-%m-%dT%H:%M:%S')
                     elif val_type == 'string':
-                        row.append(
-                            cell_elem.getAttribute('office:string-value'))
+                        val = cell_elem.getAttribute('office:string-value')
                     elif val_type == 'float':
-                        row.append(
-                            float(cell_elem.getAttribute('office:value')))
+                        val = float(cell_elem.getAttribute('office:value'))
+                else:
+                    val = None
+                row.append(val)
 
 
 class TextWriter():

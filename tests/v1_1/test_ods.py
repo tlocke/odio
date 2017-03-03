@@ -1,12 +1,12 @@
 import odio
-import datetime
+from datetime import datetime as Datetime
 import zipfile
 import os
 
 
 def test_writerow(tmpdir):
     TABLE_NAME = 'Plan'
-    ROW = ["veni, vidi, vici", 0.3, 5, datetime.datetime(2015, 6, 30, 16, 38)]
+    ROW = ["veni, vidi, vici", 0.3, 5, Datetime(2015, 6, 30, 16, 38), None]
     fname = tmpdir.join('actual.ods')
     with odio.create_spreadsheet(open(str(fname), "wb"), '1.1') as sheet:
         table = sheet.append_table(TABLE_NAME)
