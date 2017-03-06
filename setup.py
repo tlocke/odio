@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-
 import versioneer
+from setuptools import setup
 versioneer.VCS = 'git'
 versioneer.versionfile_source = 'odio/_version.py'
 versioneer.versionfile_build = 'odio/_version.py'
 versioneer.tag_prefix = ''
 versioneer.parentdir_prefix = 'odio-'
-from setuptools import setup
 
 cmdclass = dict(versioneer.get_cmdclass())
 
@@ -16,7 +14,7 @@ setup(
     name="odio",
     version=version,
     cmdclass=cmdclass,
-    description="A library for the input / output of ODF documents.",
+    description="A library for the import / export of ODF documents.",
     author="Tony Locke",
     author_email="tlocke@tlocke.org.uk",
     url="https://github.com/tlocke/odio",

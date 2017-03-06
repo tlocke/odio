@@ -3,7 +3,10 @@
 A pure-Python library for the import / export of
 http://en.wikipedia.org/wiki/OpenDocument[ODF] documents. Licensed under the
 http://opensource.org/licenses/MIT[MIT Licence]. Odio runs on Python 2.7 and
-3.5 on both CPython and PyPy and supports ODF 1.1 and 1.2.
+3.5 and supports ODF 1.1 and 1.2.
+
+image:https://travis-ci.org/tlocke/odio.svg?branch=master["Build Status",
+link="https://travis-ci.org/tlocke/odio"]
 
 
 == Installation
