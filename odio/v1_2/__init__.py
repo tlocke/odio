@@ -169,29 +169,43 @@ class TableWriter():
         self.doc = doc
         self.table_elem = table_elem
 
-    def append_row(self, vals):
-        row_elem = self.table_elem.appendChild(
-            self.doc.createElement('table:table-row'))
-        for val in vals:
-            cell_elem = row_elem.appendChild(
-                self.doc.createElement('table:table-cell'))
+    def append_row(self, values):
+        cells = []
+        for val in values:
+            atts = {}
             if isinstance(val, Datetime):
-                cell_elem.setAttribute('office:value-type', 'date')
-                cell_elem.setAttribute(
-                    'office:date-value', val.strftime('%Y-%m-%dT%H:%M:%S'))
-                cell_elem.setAttribute('table:style-name', 'cell_date')
+                atts['office:value-type'] = 'date'
+                atts['office:date-value'] = val.strftime('%Y-%m-%dT%H:%M:%S')
+                atts['table:style-name'] = 'cell_date'
             elif isinstance(val, str):
-                cell_elem.setAttribute('office:value-type', 'string')
-                cell_elem.setAttribute('office:string-value', val)
+                atts['office:value-type'] = 'string'
+                atts['office:string-value'] = val
             elif isinstance(val, (float, int)):
-                cell_elem.setAttribute('office:value-type', 'float')
-                cell_elem.setAttribute('office:value', str(val))
+                atts['office:value-type'] = 'float'
+                atts['office:value'] = str(val)
             elif isinstance(val, odio.Formula):
-                cell_elem.setAttribute('table:formula', 'of:' + str(val))
+                atts['table:formula'] = 'of:' + str(val)
             elif val is None:
                 pass
             else:
-                raise Exception("Type of '" + str(val) + "' not recognized.")
+                atts['office:value-type'] = 'string'
+                atts['office:string-value'] = str(val)
+
+            if len(cells) > 0 and cells[-1]['atts'] == atts:
+                cells[-1]['count'] += 1
+            else:
+                cells.append({'count': 1, 'atts': atts})
+
+        row_elem = self.table_elem.appendChild(
+            self.doc.createElement('table:table-row'))
+        for cell in cells:
+            cell_elem = row_elem.appendChild(
+                self.doc.createElement('table:table-cell'))
+            atts = cell['atts']
+            if cell['count'] > 1:
+                atts['table:number-columns-repeated'] = str(cell['count'])
+            for k, v in sorted(atts.items()):
+                cell_elem.setAttribute(k, v)
 
 
 class SpreadsheetReader():
@@ -225,7 +239,16 @@ class TableReader():
                         val = float(cell_elem.getAttribute('office:value'))
                 else:
                     val = None
-                row.append(val)
+
+                if cell_elem.hasAttribute('table:number-columns-repeated'):
+                    count = int(
+                        cell_elem.getAttribute(
+                            'table:number-columns-repeated'))
+                else:
+                    count = 1
+
+                for i in range(count):
+                    row.append(val)
 
 
 class TextWriter():

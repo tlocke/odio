@@ -13,7 +13,7 @@ def normalized_walk(path):
 def test_create_parse_spreadsheet(tmpdir):
     TABLE_NAME = 'Plan'
     ROW = [
-        "veni, vidi, vici", 0.3, 5, odio.Formula('=B1 + C1'),
+        "veni, vidi, vici", 0.3, 5, 5, odio.Formula('=B1 + C1'),
         datetime.datetime(2015, 6, 30, 16, 38), None]
     fname = tmpdir.join('actual.ods')
     with odio.create_spreadsheet(open(str(fname), "wb"), '1.2') as sheet:
@@ -44,6 +44,4 @@ def test_create_parse_spreadsheet(tmpdir):
     sheet = odio.parse_spreadsheet(open(str(fname), 'rb'))
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
-    print(type(table.rows[0][3].formula), type(ROW[3].formula))
-    print(table.rows[0], ROW)
     assert table.rows[0] == ROW
