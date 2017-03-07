@@ -112,6 +112,11 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 
 == Release Notes
 
+=== Version 0.0.11, 2017-03-07
+
+- Support the `table:number-columns-repeated` attribute.
+
+
 === Version 0.0.10, 2017-03-07
 
 - Spreadsheet: Python `None` corresponds to a `table-cell` with no attributes.
