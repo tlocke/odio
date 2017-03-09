@@ -46,3 +46,13 @@ def test_create_parse_spreadsheet(tmpdir):
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
     assert table.rows[0] == ROW
+
+
+def test_file_not_closed(tmpdir):
+    fname = tmpdir.join('test.ods')
+    f = open(str(fname), 'wb')
+    with odio.create_spreadsheet(f, '1.2') as sheet:
+        table = sheet.append_table('Keats')
+        table.append_row(('Season', 'of', 'mists'))
+    f.seek(0)
+    f.close()
