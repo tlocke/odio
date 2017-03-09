@@ -113,6 +113,13 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 
 == Release Notes
 
+
+=== Version 0.0.13, 2017-03-09
+
+- Bug where a file was closed when it was passed into a create_spreadsheet for
+  ODF version 1.2.
+
+
 === Version 0.0.12, 2017-03-09
 
 - The file-like object passed into the parse_* and create_* functions are no
