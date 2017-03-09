@@ -24,7 +24,6 @@ def create_spreadsheet(f, version='1.2', compressed=True):
 def parse_spreadsheet(f):
     with zipfile.ZipFile(f, 'r') as z:
         content = z.read('content.xml')
-    f.close()
     dom = xml.dom.minidom.parseString(content)
     version = dom.documentElement.getAttribute('office:version')
     spreadsheet_elem = dom.getElementsByTagName('office:spreadsheet')[0]

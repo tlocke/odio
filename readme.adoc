@@ -33,7 +33,7 @@ Create a spreadsheet:
 >>> # Create the spreadsheet.
 >>> # Version is ODF version. Can be '1.1' or '1.2'. The default is '1.2'.
 >>> # Default for 'compressed' is True.
->>> with odio.create_spreadsheet(open('test.ods', "wb"), version='1.2', compressed=True) as sheet:
+>>> with open('test.ods', 'wb') as f, odio.create_spreadsheet(f, version='1.2', compressed=True) as sheet:
 ...	
 ...	# Add a table (tab) to the spreadsheet
 ... 	table = sheet.append_table('Plan')
@@ -54,7 +54,8 @@ import the spreadsheet:
 >>>
 >>> # Parse the document we just created.
 >>> # Version is ODF version. Can be '1.1' or '1.2'. The default is '1.2'.
->>> sheet = odio.parse_spreadsheet(open('test.ods', "rb"))
+>>> with open('test.ods', 'rb') as f:
+...     sheet = odio.parse_spreadsheet(f)
 >>>
 >>> table = sheet.tables[0]
 >>> print(table.name)
@@ -73,7 +74,7 @@ Create a text document:
 >>> 
 >>>
 >>> # Create the text document. The ODF version string can be '1.2' or '1.1'
->>> with create_text(open('test.odt', "wb"), '1.2') as txt:
+>>> with open('test.odt', 'wb') as f, create_text(f, '1.2') as txt:
 ...	
 ...     txt.append(
 ...         P("The Meditations", text_style_name='Title'),

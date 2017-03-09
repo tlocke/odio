@@ -147,7 +147,6 @@ class SpreadsheetWriter():
     def close(self):
         self.z.writestr('content.xml', self.doc.toprettyxml(encoding='utf-8'))
         self.z.close()
-        self.f.close()
 
     def __enter__(self):
         return self
