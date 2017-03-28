@@ -18,8 +18,7 @@ def test_create_parse_spreadsheet(tmpdir):
     fname = tmpdir.join('actual.ods')
     with open(str(fname), 'wb') as f, \
             odio.create_spreadsheet(f, '1.2') as sheet:
-        table = sheet.append_table(TABLE_NAME)
-        table.append_row(ROW)
+        sheet.append_table(TABLE_NAME, [ROW])
     actual_dir = str(tmpdir.mkdir('actual'))
     with zipfile.ZipFile(str(fname)) as z:
         z.extractall(actual_dir)
@@ -39,7 +38,8 @@ def test_create_parse_spreadsheet(tmpdir):
                 os.path.join(desired_dir, desired_pth, desired_fl))
             ac = ''.join(actual_f)
             de = ''.join(desired_f)
-            print(ac, de)
+            print(de)
+            print(ac)
             assert ac == de
 
     sheet = odio.parse_spreadsheet(open(str(fname), 'rb'))
@@ -52,7 +52,6 @@ def test_file_not_closed(tmpdir):
     fname = tmpdir.join('test.ods')
     f = open(str(fname), 'wb')
     with odio.create_spreadsheet(f, '1.2') as sheet:
-        table = sheet.append_table('Keats')
-        table.append_row(('Season', 'of', 'mists'))
+        sheet.append_table('Keats', ('Season', 'of', 'mists'))
     f.seek(0)
     f.close()

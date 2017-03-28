@@ -4,9 +4,48 @@ from datetime import datetime as Datetime
 import zipfile
 import odio
 from odio.common import P, H, Span
+from xml.sax.saxutils import escape
+from tempfile import NamedTemporaryFile
 
 
 OFFICE_VALUE_TYPE = 'office:value-type'
+
+
+class XmlWriter():
+
+    def __init__(self, output):
+        self.indentation = 0
+        self.output = output
+        self._write('<?xml version="1.0" encoding="utf-8"?>\n')
+
+    @staticmethod
+    def atts_to_str(attrs):
+        if len(attrs) == 0:
+            return ''
+        else:
+            return ' ' + ' '.join(
+                k + '="' + v + '"' for k, v in sorted(attrs.items()))
+
+    def _write(self, line, indent=True):
+        if indent:
+            self.output.write((' ' * self.indentation * 2).encode('utf8'))
+        self.output.write(line.encode('utf8'))
+
+    def start_tag(self, name, attrs):
+        self._write('<' + name + XmlWriter.atts_to_str(attrs) + '>\n')
+        self.indentation += 1
+
+    def end_tag(self, name):
+        self.indentation -= 1
+        self._write('</' + name + '>\n')
+
+    def simple_tag(self, name, attrs, contents=None):
+        if contents is None:
+            self._write('<' + name + XmlWriter.atts_to_str(attrs) + '/>\n')
+        else:
+            self._write('<' + name + XmlWriter.atts_to_str(attrs) + '>')
+            self._write(escape(contents), indent=False)
+            self._write('</' + name + '>\n', indent=False)
 
 
 class SpreadsheetWriter():
@@ -93,118 +132,119 @@ class SpreadsheetWriter():
     office:version="1.2">
 </office:document-styles>
 """)
-        self.doc = xml.dom.minidom.parseString(
-            """<?xml version="1.0" encoding="UTF-8"?>
-<office:document-content
-    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
-    xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-    xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
-    xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-    xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
-    xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0"
-    xmlns:math="http://www.w3.org/1998/Math/MathML"
-    xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
-    xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
-    xmlns:dom="http://www.w3.org/2001/xml-events"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:css3t="http://www.w3.org/TR/css3-text/"
-    office:version="1.2">
-  <office:scripts/>
-  <office:automatic-styles>
-    <number:date-style style:name="date">
-      <number:year number:style="long"/>
-      <number:text>-</number:text>
-      <number:month number:style="long"/>
-      <number:text>-</number:text>
-      <number:day number:style="long"/>
-      <number:text> </number:text>
-      <number:hours number:style="long"/>
-      <number:text>:</number:text>
-      <number:minutes number:style="long"/>
-    </number:date-style>
-    <style:style style:name="cell_date" style:family="table-cell"
-      style:parent-style-name="Default" style:data-style-name="date"/>
-  </office:automatic-styles>
-  <office:body>
-    <office:spreadsheet>
-    </office:spreadsheet>
-  </office:body>
-</office:document-content>""")
-        self.spreadsheet_elem = self.doc.getElementsByTagName(
-            'office:spreadsheet')[0]
+        self.tmp = NamedTemporaryFile()
+        self.writer = XmlWriter(self.tmp)
+        attrs = {
+            'xmlns:office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
+            'xmlns:office': "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
+            'xmlns:style': "urn:oasis:names:tc:opendocument:xmlns:style:1.0",
+            'xmlns:text': "urn:oasis:names:tc:opendocument:xmlns:text:1.0",
+            'xmlns:table': "urn:oasis:names:tc:opendocument:xmlns:table:1.0",
+            'xmlns:draw': "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0",
+            'xmlns:fo':
+                "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0",
+            'xmlns:xlink': "http://www.w3.org/1999/xlink",
+            'xmlns:dc': "http://purl.org/dc/elements/1.1/",
+            'xmlns:meta': "urn:oasis:names:tc:opendocument:xmlns:meta:1.0",
+            'xmlns:number':
+                "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0",
+            'xmlns:presentation':
+                "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0",
+            'xmlns:svg':
+                "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0",
+            'xmlns:chart': "urn:oasis:names:tc:opendocument:xmlns:chart:1.0",
+            'xmlns:dr3d': "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0",
+            'xmlns:math': "http://www.w3.org/1998/Math/MathML",
+            'xmlns:form': "urn:oasis:names:tc:opendocument:xmlns:form:1.0",
+            'xmlns:script': "urn:oasis:names:tc:opendocument:xmlns:script:1.0",
+            'xmlns:dom': "http://www.w3.org/2001/xml-events",
+            'xmlns:xforms': "http://www.w3.org/2002/xforms",
+            'xmlns:xsd': "http://www.w3.org/2001/XMLSchema",
+            'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance",
+            'xmlns:of': 'urn:oasis:names:tc:opendocument:xmlns:of:1.2',
+            'xmlns:xhtml': "http://www.w3.org/1999/xhtml",
+            'xmlns:css3t': "http://www.w3.org/TR/css3-text/",
+            'office:version': "1.2"}
+        self.writer.start_tag('office:document-content', attrs)
+        self.writer.simple_tag('office:scripts', {})
+        self.writer.start_tag('office:automatic-styles', {})
+        self.writer.start_tag('number:date-style', {'style:name': "date"})
+        self.writer.simple_tag('number:year', {'number:style': "long"})
+        self.writer.simple_tag('number:text', {}, '-')
+        self.writer.simple_tag('number:month', {'number:style': "long"})
+        self.writer.simple_tag('number:text', {}, '-')
+        self.writer.simple_tag('number:day', {'number:style': "long"})
+        self.writer.simple_tag('number:text', {}, ' ')
+        self.writer.simple_tag('number:hours', {'number:style': "long"})
+        self.writer.simple_tag('number:text', {}, ':')
+        self.writer.simple_tag('number:minutes', {'number:style': "long"})
+        self.writer.end_tag('number:date-style')
+        self.writer.simple_tag(
+            'style:style', {
+                'style:name': 'cell_date',
+                'style:family': 'table-cell',
+                'style:parent-style-name': 'Default',
+                'style:data-style-name': 'date'})
+        self.writer.end_tag('office:automatic-styles')
+        self.writer.start_tag('office:body', {})
+        self.writer.start_tag('office:spreadsheet', {})
 
-    def append_table(self, name):
-        table_elem = self.spreadsheet_elem.appendChild(
-            self.doc.createElement('table:table'))
-        table_elem.setAttribute('table:name', name)
-        table_elem.appendChild(self.doc.createElement('table:table-column'))
-        return TableWriter(self.doc, table_elem)
+    def append_table(self, name, rows):
+        self.writer.start_tag('table:table', {'table:name': name})
+        self.writer.simple_tag('table:table-column', {})
+        for row in rows:
+            self.writer.start_tag('table:table-row', {})
+            cells = []
+            for val in row:
+                atts = {}
+                if isinstance(val, Datetime):
+                    atts['office:value-type'] = 'date'
+                    atts['office:date-value'] = val.strftime(
+                        '%Y-%m-%dT%H:%M:%S')
+                    atts['table:style-name'] = 'cell_date'
+                elif isinstance(val, str):
+                    atts['office:value-type'] = 'string'
+                    atts['office:string-value'] = val
+                elif isinstance(val, (float, int)):
+                    atts['office:value-type'] = 'float'
+                    atts['office:value'] = str(val)
+                elif isinstance(val, odio.Formula):
+                    atts['table:formula'] = 'of:' + str(val)
+                elif val is None:
+                    pass
+                else:
+                    atts['office:value-type'] = 'string'
+                    atts['office:string-value'] = str(val)
+
+                if len(cells) > 0 and cells[-1]['atts'] == atts:
+                    cells[-1]['count'] += 1
+                else:
+                    cells.append({'count': 1, 'atts': atts})
+
+            for cell in cells:
+                atts = cell['atts']
+                if cell['count'] > 1:
+                    atts['table:number-columns-repeated'] = str(cell['count'])
+                self.writer.simple_tag('table:table-cell', atts)
+            self.writer.end_tag('table:table-row')
+
+        self.writer.end_tag('table:table')
 
     def close(self):
-        self.z.writestr('content.xml', self.doc.toprettyxml(encoding='utf-8'))
+        self.writer.end_tag('office:spreadsheet')
+        self.writer.end_tag('office:body')
+        self.writer.end_tag('office:document-content')
+        self.tmp.flush()
+        self.tmp.seek(0)
+        self.z.write(self.tmp.name, 'content.xml')
         self.z.close()
+        self.tmp.close()
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
-
-
-class TableWriter():
-    def __init__(self, doc, table_elem):
-        self.doc = doc
-        self.table_elem = table_elem
-
-    def append_row(self, values):
-        cells = []
-        for val in values:
-            atts = {}
-            if isinstance(val, Datetime):
-                atts['office:value-type'] = 'date'
-                atts['office:date-value'] = val.strftime('%Y-%m-%dT%H:%M:%S')
-                atts['table:style-name'] = 'cell_date'
-            elif isinstance(val, str):
-                atts['office:value-type'] = 'string'
-                atts['office:string-value'] = val
-            elif isinstance(val, (float, int)):
-                atts['office:value-type'] = 'float'
-                atts['office:value'] = str(val)
-            elif isinstance(val, odio.Formula):
-                atts['table:formula'] = 'of:' + str(val)
-            elif val is None:
-                pass
-            else:
-                atts['office:value-type'] = 'string'
-                atts['office:string-value'] = str(val)
-
-            if len(cells) > 0 and cells[-1]['atts'] == atts:
-                cells[-1]['count'] += 1
-            else:
-                cells.append({'count': 1, 'atts': atts})
-
-        row_elem = self.table_elem.appendChild(
-            self.doc.createElement('table:table-row'))
-        for cell in cells:
-            cell_elem = row_elem.appendChild(
-                self.doc.createElement('table:table-cell'))
-            atts = cell['atts']
-            if cell['count'] > 1:
-                atts['table:number-columns-repeated'] = str(cell['count'])
-            for k, v in sorted(atts.items()):
-                cell_elem.setAttribute(k, v)
 
 
 class SpreadsheetReader():
