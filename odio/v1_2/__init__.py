@@ -4,7 +4,7 @@ from datetime import datetime as Datetime
 import zipfile
 import odio
 from odio.common import P, H, Span
-from xml.sax.saxutils import escape
+from xml.sax.saxutils import escape, quoteattr
 from tempfile import NamedTemporaryFile
 
 
@@ -24,7 +24,7 @@ class XmlWriter():
             return ''
         else:
             return ' ' + ' '.join(
-                k + '="' + v + '"' for k, v in sorted(attrs.items()))
+                k + '=' + quoteattr(v) for k, v in sorted(attrs.items()))
 
     def _write(self, line, indent=True):
         if indent:
