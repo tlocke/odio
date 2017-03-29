@@ -113,6 +113,11 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 == Release Notes
 
 
+=== Version 0.0.15, 2017-03-29
+
+- Fix bug where XML attribute values aren't escaped.
+
+
 === Version 0.0.14, 2017-03-28
 
 - Use a streaming approach to file processing rather than an in-memory
