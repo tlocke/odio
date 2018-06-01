@@ -216,4 +216,4 @@ then run `tox` from the `odio` directory:
 Run `tox` make sure all tests pass, then update the release notes and then do:
 
  git tag -a x.y.z -m "Version x.y.z"
- python setup.py register sdist bdist_wheel upload
+ python setup.py sdist bdist_wheel upload
