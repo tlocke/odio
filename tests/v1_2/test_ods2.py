@@ -14,7 +14,7 @@ def test_create_parse_spreadsheet(tmpdir):
     TABLE_NAME = 'Plan'
     ROW = [
         "veni, vidi, vici", 0.3, 5, 5, odio.Formula('=B1 + C1'),
-        datetime.datetime(2015, 6, 30, 16, 38), None, "Dombey & Son"]
+        datetime.datetime(2015, 6, 30, 16, 38), None, "Dombey & Son", True]
     fname = tmpdir.join('actual.ods')
     with open(str(fname), 'wb') as f, \
             odio.create_spreadsheet(f, '1.2') as sheet:

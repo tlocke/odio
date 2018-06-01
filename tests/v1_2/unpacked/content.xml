@@ -27,6 +27,7 @@
           <table:table-cell office:date-value="2015-06-30T16:38:00" office:value-type="date" table:style-name="cell_date"/>
           <table:table-cell/>
           <table:table-cell office:string-value="Dombey &amp; Son" office:value-type="string"/>
+          <table:table-cell office:boolean-value="true" office:value-type="boolean"/>
         </table:table-row>
       </table:table>
     </office:spreadsheet>

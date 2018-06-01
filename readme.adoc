@@ -113,6 +113,11 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 == Release Notes
 
 
+=== Version 0.0.16, 2018-06-01
+
+- Support the boolean type.
+
+
 === Version 0.0.15, 2017-03-29
 
 - Fix bug where XML attribute values aren't escaped.

@@ -205,6 +205,9 @@ class SpreadsheetWriter():
                 elif isinstance(val, str):
                     atts['office:value-type'] = 'string'
                     atts['office:string-value'] = val
+                elif isinstance(val, bool):
+                    atts['office:value-type'] = 'boolean'
+                    atts['office:boolean-value'] = 'true' if val else 'false'
                 elif isinstance(val, (float, int)):
                     atts['office:value-type'] = 'float'
                     atts['office:value'] = str(val)
@@ -276,6 +279,9 @@ class TableReader():
                         val = cell_elem.getAttribute('office:string-value')
                     elif val_type == 'float':
                         val = float(cell_elem.getAttribute('office:value'))
+                    elif val_type == 'boolean':
+                        val = cell_elem.getAttribute(
+                            'office:boolean-value') == 'true'
                 else:
                     val = None
 
