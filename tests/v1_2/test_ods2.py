@@ -2,6 +2,7 @@ import odio
 import datetime
 import zipfile
 import os
+from xml.dom.minidom import parseString
 
 
 def normalized_walk(path):
@@ -46,6 +47,24 @@ def test_create_parse_spreadsheet(tmpdir):
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
     assert table.rows[0] == ROW
+
+
+def test_parse_spreadsheet_cell_p():
+    xml_str = """<?xml version="1.0" encoding="UTF-8"?>
+<table:table
+    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+    table:name="table1">
+  <table:table-row>
+    <table:table-cell office:value-type="string">
+      <text:p>electron</text:p>
+    </table:table-cell>
+  </table:table-row>
+</table:table>"""
+    dom = parseString(xml_str)
+    result = odio.v1_2.TableReader(dom.documentElement)
+    assert result.rows[0][0] == 'electron'
 
 
 def test_file_not_closed(tmpdir):

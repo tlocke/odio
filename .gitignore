@@ -8,3 +8,5 @@ odio.egg-info/
 test.ods
 test.odt
 .cache/
+.pytest_cache/
+venv/

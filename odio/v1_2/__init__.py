@@ -257,6 +257,16 @@ class SpreadsheetReader():
             self.tables.append(TableReader(table_elem))
 
 
+def _get_text(node):
+    txt = []
+    for child in node.childNodes:
+        if child.nodeType == Node.TEXT_NODE:
+            txt.append(child.nodeValue.strip())
+        else:
+            txt.append(_get_text(child))
+    return None if len(txt) == 0 else ''.join(txt)
+
+
 class TableReader():
     def __init__(self, table_elem):
         self.name = table_elem.getAttribute('table:name')
@@ -276,7 +286,10 @@ class TableReader():
                             cell_elem.getAttribute('office:date-value'),
                             '%Y-%m-%dT%H:%M:%S')
                     elif val_type == 'string':
-                        val = cell_elem.getAttribute('office:string-value')
+                        if cell_elem.hasAttribute('office:string-value'):
+                            val = cell_elem.getAttribute('office:string-value')
+                        else:
+                            val = _get_text(cell_elem)
                     elif val_type == 'float':
                         val = float(cell_elem.getAttribute('office:value'))
                     elif val_type == 'boolean':
