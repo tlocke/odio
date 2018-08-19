@@ -113,6 +113,12 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 == Release Notes
 
 
+=== Version 0.0.17, 2018-08-19
+
+- When parsing a spreadsheet cell of text type, if the value isn't contained
+  in the attribute, recursively use the next nodes in the element contents.
+
+
 === Version 0.0.16, 2018-06-01
 
 - Support the boolean type.

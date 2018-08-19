@@ -10,3 +10,4 @@ test.odt
 .cache/
 .pytest_cache/
 venv/
+*.swp
