@@ -4,11 +4,27 @@ from datetime import datetime as Datetime
 import zipfile
 import odio
 from odio.common import P, H, Span
-from xml.sax.saxutils import escape, quoteattr
 from tempfile import NamedTemporaryFile
 
 
 OFFICE_VALUE_TYPE = 'office:value-type'
+
+
+def escape(data):
+    return data.replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;")
+
+
+def quoteattr(data):
+    data = escape(data)
+
+    if '"' in data:
+        if "'" in data:
+            data = '"%s"' % data.replace('"', "&quot;")
+        else:
+            data = "'%s'" % data
+    else:
+        data = '"%s"' % data
+    return data
 
 
 class XmlWriter():

@@ -112,6 +112,12 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 
 == Release Notes
 
+=== Version 0.0.18, 2019-11-29
+
+- Performance improvement: rather than use the `xml.sax.saxutils` versions of
+  `escape` and `quoteattr` I've copied them into the source of `odio`, but
+  removing the code for entities that aren't needed.
+
 
 === Version 0.0.17, 2018-08-19
 
@@ -222,4 +228,8 @@ then run `tox` from the `odio` directory:
 Run `tox` make sure all tests pass, then update the release notes and then do:
 
  git tag -a x.y.z -m "Version x.y.z"
- python setup.py sdist bdist_wheel upload
+ rm -r build
+ rm -r dist
+ python setup.py sdist bdist_wheel --python-tag py3
+ for f in dist/*; do gpg --detach-sign -a $f; done
+ twine upload dist/*
