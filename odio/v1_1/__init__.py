@@ -85,57 +85,150 @@ class SpreadsheetWriter():
     xmlns:css3t="http://www.w3.org/TR/css3-text/"
     office:version="1.1">
 </office:document-styles>""")
-        self.doc = xml.dom.minidom.parseString(
-            """<?xml version="1.0" encoding="UTF-8"?>
-<office:document-content
-    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-    xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-    xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:dc="http://purl.org/dc/elements/1.1/"
-    xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
-    xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
-    xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
-    xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
-    xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
-    xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0"
-    xmlns:math="http://www.w3.org/1998/Math/MathML"
-    xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
-    xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0"
-    xmlns:dom="http://www.w3.org/2001/xml-events"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:css3t="http://www.w3.org/TR/css3-text/"
-    office:version="1.1">
-  <office:scripts/>
-  <office:automatic-styles>
-    <number:date-style style:name="date">
-      <number:year number:style="long"/>
-      <number:text>-</number:text>
-      <number:month number:style="long"/>
-      <number:text>-</number:text>
-      <number:day number:style="long"/>
-      <number:text> </number:text>
-      <number:hours number:style="long"/>
-      <number:text>:</number:text>
-      <number:minutes number:style="long"/>
-    </number:date-style>
-    <style:style style:name="cell_date" style:family="table-cell"
-      style:parent-style-name="Default" style:data-style-name="date"/>
-  </office:automatic-styles>
-  <office:body>
-    <office:spreadsheet>
-    </office:spreadsheet>
-  </office:body>
-</office:document-content>""")
-        self.spreadsheet_elem = self.doc.getElementsByTagName(
-            'office:spreadsheet')[0]
+
+        impl = xml.dom.minidom.getDOMImplementation()
+        self.doc = impl.createDocument(
+            "urn:oasis:names:tc:opendocument:xmlns:office:1.0",
+            "office:document-content", None)
+        document_content = self.doc.documentElement
+        for name, value in (
+                ('office:version', "1.1"),
+                (
+                    'xmlns:chart',
+                    "urn:oasis:names:tc:opendocument:xmlns:chart:1.0"
+                ),
+                ('xmlns:css3t', "http://www.w3.org/TR/css3-text/"),
+                ('xmlns:dc', "http://purl.org/dc/elements/1.1/"),
+                ('xmlns:dom', "http://www.w3.org/2001/xml-events"),
+                (
+                    'xmlns:dr3d',
+                    "urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0"
+                ),
+                (
+                    'xmlns:draw',
+                    "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+                ),
+                (
+                    'xmlns:fo',
+                    "urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:"
+                    "1.0"
+                ),
+                (
+                    'xmlns:form',
+                    "urn:oasis:names:tc:opendocument:xmlns:form:1.0"
+                ),
+                ('xmlns:math', "http://www.w3.org/1998/Math/MathML"),
+                (
+                    'xmlns:meta',
+                    "urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+                ),
+                (
+                    'xmlns:number',
+                    "urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+                ),
+                ('xmlns:of', "urn:oasis:names:tc:opendocument:xmlns:of:1.2"),
+                (
+                    'xmlns:office',
+                    "urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+                ),
+                (
+                    'xmlns:presentation',
+                    "urn:oasis:names:tc:opendocument:xmlns:presentation:1.0"
+                ),
+                (
+                    'xmlns:script',
+                    "urn:oasis:names:tc:opendocument:xmlns:script:1.0"
+                ),
+                (
+                    'xmlns:style',
+                    "urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+                ),
+                (
+                    'xmlns:svg',
+                    "urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+                ),
+                (
+                    'xmlns:table',
+                    "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+                ),
+                (
+                    'xmlns:text',
+                    "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+                ),
+                ('xmlns:xforms', "http://www.w3.org/2002/xforms"),
+                ('xmlns:xhtml', "http://www.w3.org/1999/xhtml"),
+                ('xmlns:xlink', "http://www.w3.org/1999/xlink"),
+                ('xmlns:xsd', "http://www.w3.org/2001/XMLSchema"),
+                ('xmlns:xsi', "http://www.w3.org/2001/XMLSchema-instance")):
+            document_content.setAttribute(name, value)
+        scripts = self.doc.createElement('office:scripts')
+        document_content.appendChild(scripts)
+
+        automatic_styles = self.doc.createElement('office:automatic-styles')
+        document_content.appendChild(automatic_styles)
+
+        date_style = self.doc.createElement('number:date-style')
+        automatic_styles.appendChild(date_style)
+
+        date_style.setAttribute('style:name', 'date')
+
+        year = self.doc.createElement('number:year')
+        date_style.appendChild(year)
+
+        year.setAttribute('number:style', 'long')
+        text = self.doc.createElement('number:text')
+        date_style.appendChild(text)
+
+        text_node = self.doc.createTextNode('-')
+        text.appendChild(text_node)
+
+        month = self.doc.createElement('number:month')
+        date_style.appendChild(month)
+
+        month.setAttribute('number:style', 'long')
+        text = self.doc.createElement('number:text')
+        date_style.appendChild(text)
+
+        text_node = self.doc.createTextNode('-')
+        text.appendChild(text_node)
+
+        day = self.doc.createElement('number:day')
+        date_style.appendChild(day)
+
+        day.setAttribute('number:style', 'long')
+        text = self.doc.createElement('number:text')
+        date_style.appendChild(text)
+
+        text_node = self.doc.createTextNode(' ')
+        text.appendChild(text_node)
+
+        hours = self.doc.createElement('number:hours')
+        date_style.appendChild(hours)
+
+        hours.setAttribute('number:style', 'long')
+        text = self.doc.createElement('number:text')
+        date_style.appendChild(text)
+
+        text_node = self.doc.createTextNode(':')
+        text.appendChild(text_node)
+
+        minutes = self.doc.createElement('number:minutes')
+        date_style.appendChild(minutes)
+
+        minutes.setAttribute('number:style', 'long')
+
+        style = self.doc.createElement('style:style')
+        automatic_styles.appendChild(style)
+
+        style.setAttribute('style:data-style-name', "date")
+        style.setAttribute('style:family', "table-cell")
+        style.setAttribute('style:name', "cell_date")
+        style.setAttribute('style:parent-style-name', "Default")
+
+        body = self.doc.createElement('office:body')
+        document_content.appendChild(body)
+        self.spreadsheet_elem = self.doc.createElement('office:spreadsheet')
+        body.appendChild(self.spreadsheet_elem)
 
     def append_table(self, name):
         table_elem = self.spreadsheet_elem.appendChild(
@@ -167,16 +260,16 @@ class Table():
             cell_elem = row_elem.appendChild(
                 self.doc.createElement('table:table-cell'))
             if isinstance(val, Datetime):
-                cell_elem.setAttribute('office:value-type', 'date')
                 cell_elem.setAttribute(
                     'office:date-value', val.strftime('%Y-%m-%dT%H:%M:%S'))
+                cell_elem.setAttribute('office:value-type', 'date')
                 cell_elem.setAttribute('table:style-name', 'cell_date')
             elif isinstance(val, str):
-                cell_elem.setAttribute('office:value-type', 'string')
                 cell_elem.setAttribute('office:string-value', val)
+                cell_elem.setAttribute('office:value-type', 'string')
             elif isinstance(val, (float, int)):
-                cell_elem.setAttribute('office:value-type', 'float')
                 cell_elem.setAttribute('office:value', str(val))
+                cell_elem.setAttribute('office:value-type', 'float')
             elif val is None:
                 pass
             else:
