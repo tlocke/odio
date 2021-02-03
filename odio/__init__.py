@@ -1,7 +1,8 @@
+import xml.dom.minidom
+import zipfile
+
 import odio.v1_1
 import odio.v1_2
-import zipfile
-import xml.dom.minidom
 from odio.common import H, P, Span
 
 from ._version import get_versions

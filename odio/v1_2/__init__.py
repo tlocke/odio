@@ -1,10 +1,11 @@
 import xml.dom.minidom
-from xml.dom import Node
-from datetime import datetime as Datetime
 import zipfile
-import odio
-from odio.common import P, H, Span
+from datetime import datetime as Datetime
 from tempfile import NamedTemporaryFile
+from xml.dom import Node
+
+import odio
+from odio.common import H, P, Span
 
 
 OFFICE_VALUE_TYPE = 'office:value-type'
@@ -60,7 +61,9 @@ class XmlWriter():
             self._write('<' + name + XmlWriter.atts_to_str(attrs) + '/>\n')
         else:
             self._write('<' + name + XmlWriter.atts_to_str(attrs) + '>')
-            self._write(escape(contents), indent=False)
+            self._write(
+                '<text:line-break>'.join(escape(contents).splitlines()),
+                indent=False)
             self._write('</' + name + '>\n', indent=False)
 
 

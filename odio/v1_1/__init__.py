@@ -1,6 +1,6 @@
 import xml.dom.minidom
-from datetime import datetime as Datetime
 import zipfile
+from datetime import datetime as Datetime
 
 
 OFFICE_VALUE_TYPE = 'office:value-type'

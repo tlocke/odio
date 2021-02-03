@@ -1,4 +1,3 @@
-from six import iteritems
 from itertools import chain
 
 
@@ -13,13 +12,13 @@ class Node():
 
     def __repr__(self):
         attrs = self.attributes.copy()
-        for k, v in iteritems(self.default_attrs):
+        for k, v in self.default_attrs.items():
             if k in attrs and attrs[k] == v:
                 del attrs[k]
         arg_str = ', '.join(
             chain(
                 (repr(node) for node in self.nodes),
-                (k + '=' + repr(v) for k, v in iteritems(attrs))))
+                (k + '=' + repr(v) for k, v in attrs.items())))
         return "odio." + self.__class__.__name__ + "(" + arg_str + ")"
 
     def __eq__(self, other):
@@ -29,7 +28,7 @@ class Node():
     def attach(self, doc, parent_elem):
         node_elem = doc.createElement(self.name)
         parent_elem.appendChild(node_elem)
-        for k, v in iteritems(self.attributes):
+        for k, v in self.attributes.items():
             try:
                 i = k.index('_')
             except ValueError:
