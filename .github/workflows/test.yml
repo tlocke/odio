@@ -1,4 +1,4 @@
-name: pg8000
+name: odio
 
 on: [push]
 

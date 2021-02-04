@@ -2,18 +2,18 @@
 
 A pure-Python library for the import / export of
 http://en.wikipedia.org/wiki/OpenDocument[ODF] documents. Licensed under the
-http://opensource.org/licenses/MIT[MIT Licence]. Odio runs on Python 3.5 and
+http://opensource.org/licenses/MIT[MIT Licence]. Odio runs on Python 3.6+ and
 supports ODF 1.1 and 1.2.
 
-image:https://travis-ci.org/tlocke/odio.svg?branch=master["Build Status",
-link="https://travis-ci.org/tlocke/odio"]
+image:https://github.com/tlocke/odio/workflows/odio/badge.svg["Build Status",
+link="https://github.com/tlocke/odio/actions"]
 
 
 == Installation
 
 It's a good idea to set up a virtualenv:
 
- virtualenv venv
+ python3 -m venv venv
  source venv/bin/activate
 
 then install Odio with pip:
@@ -110,7 +110,38 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 ....
 
 
+== Regression Tests
+
+To run the regression tests, install http://testrun.org/tox/latest/[tox]:
+
+ pip install tox
+
+
+then run `tox` from the `odio` directory:
+
+ tox
+
+
+== Doing A Release Of Odio
+
+Run `tox` make sure all tests pass, then update the release notes and then do:
+
+ git tag -a x.y.z -m "Version x.y.z"
+ rm -r build
+ rm -r dist
+ python setup.py sdist bdist_wheel --python-tag py3
+ for f in dist/*; do gpg --detach-sign -a $f; done
+ twine upload dist/*
+
+
 == Release Notes
+
+=== Version 0.0.19, 2021-02-04
+
+- Where line breaks appear in a text element's content, they are now replaced
+  by a `<text:line-break/>` element. This means that line breaks appear in the
+  spreadsheet, whereas before they didn't.
+
 
 === Version 0.0.18, 2019-11-29
 
@@ -209,27 +240,3 @@ odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Empha
 === Version 0.0.0, 2015-05-25
 
 - Initial release, nothing to see yet.
-
-
-== Regression Tests
-
-To run the regression tests, install http://testrun.org/tox/latest/[tox]:
-
- pip install tox
-
-
-then run `tox` from the `odio` directory:
-
- tox
-
-
-== Doing A Release Of Odio
-
-Run `tox` make sure all tests pass, then update the release notes and then do:
-
- git tag -a x.y.z -m "Version x.y.z"
- rm -r build
- rm -r dist
- python setup.py sdist bdist_wheel --python-tag py3
- for f in dist/*; do gpg --detach-sign -a $f; done
- twine upload dist/*
