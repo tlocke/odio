@@ -61,9 +61,7 @@ class XmlWriter():
             self._write('<' + name + XmlWriter.atts_to_str(attrs) + '/>\n')
         else:
             self._write('<' + name + XmlWriter.atts_to_str(attrs) + '>')
-            self._write(
-                '<text:line-break>'.join(escape(contents).splitlines()),
-                indent=False)
+            self._write(escape(contents), indent=False)
             self._write('</' + name + '>\n', indent=False)
 
 
@@ -216,6 +214,7 @@ class SpreadsheetWriter():
             cells = []
             for val in row:
                 atts = {}
+                contents = None
                 if isinstance(val, Datetime):
                     atts['office:value-type'] = 'date'
                     atts['office:date-value'] = val.strftime(
@@ -223,7 +222,8 @@ class SpreadsheetWriter():
                     atts['table:style-name'] = 'cell_date'
                 elif isinstance(val, str):
                     atts['office:value-type'] = 'string'
-                    atts['office:string-value'] = val
+                    contents = val
+                    # atts['office:string-value'] = val
                 elif isinstance(val, bool):
                     atts['office:value-type'] = 'boolean'
                     atts['office:boolean-value'] = 'true' if val else 'false'
@@ -238,16 +238,24 @@ class SpreadsheetWriter():
                     atts['office:value-type'] = 'string'
                     atts['office:string-value'] = str(val)
 
-                if len(cells) > 0 and cells[-1]['atts'] == atts:
+                if len(cells) > 0 and cells[-1]['atts'] == atts and \
+                        cells[-1]['contents'] == contents:
                     cells[-1]['count'] += 1
                 else:
-                    cells.append({'count': 1, 'atts': atts})
+                    cells.append(
+                        {'count': 1, 'atts': atts, 'contents': contents})
 
             for cell in cells:
                 atts = cell['atts']
+                contents = cell['contents']
                 if cell['count'] > 1:
                     atts['table:number-columns-repeated'] = str(cell['count'])
-                self.writer.simple_tag('table:table-cell', atts)
+                if contents is None:
+                    self.writer.simple_tag('table:table-cell', atts)
+                else:
+                    self.writer.start_tag('table:table-cell', atts)
+                    self.writer.simple_tag('text:p', {}, contents=contents)
+                    self.writer.end_tag('table:table-cell')
             self.writer.end_tag('table:table-row')
 
         self.writer.end_tag('table:table')

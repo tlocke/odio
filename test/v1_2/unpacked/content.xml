@@ -20,13 +20,17 @@
       <table:table table:name="Plan">
         <table:table-column/>
         <table:table-row>
-          <table:table-cell office:string-value="veni, vidi, vici" office:value-type="string"/>
+          <table:table-cell office:value-type="string">
+            <text:p>veni, vidi, vici</text:p>
+          </table:table-cell>
           <table:table-cell office:value="0.3" office:value-type="float"/>
           <table:table-cell office:value="5" office:value-type="float" table:number-columns-repeated="2"/>
           <table:table-cell table:formula="of:=B1 + C1"/>
           <table:table-cell office:date-value="2015-06-30T16:38:00" office:value-type="date" table:style-name="cell_date"/>
           <table:table-cell/>
-          <table:table-cell office:string-value="Dombey &amp; Son" office:value-type="string"/>
+          <table:table-cell office:value-type="string">
+            <text:p>Dombey &amp; Son</text:p>
+          </table:table-cell>
           <table:table-cell office:boolean-value="true" office:value-type="boolean"/>
         </table:table-row>
       </table:table>
