@@ -1,8 +1,9 @@
-import odio
 import datetime
-import zipfile
 import os
+import zipfile
 from xml.dom.minidom import parseString
+
+import odio
 
 
 def normalized_walk(path):
@@ -74,3 +75,12 @@ def test_file_not_closed(tmpdir):
         sheet.append_table('Keats', ('Season', 'of', 'mists'))
     f.seek(0)
     f.close()
+
+
+def test_get_text():
+    xml_str = """<?xml version="1.0" encoding="UTF-8"?>
+<cell></cell>"""
+    dom = parseString(xml_str)
+
+    val = odio.v1_2._get_text(dom)
+    assert val == ''

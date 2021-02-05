@@ -285,13 +285,13 @@ class SpreadsheetReader():
 
 
 def _get_text(node):
-    txt = []
+    txt = ['']
     for child in node.childNodes:
         if child.nodeType == Node.TEXT_NODE:
             txt.append(child.nodeValue.strip())
         else:
             txt.append(_get_text(child))
-    return None if len(txt) == 0 else ''.join(txt)
+    return ''.join(txt)
 
 
 class TableReader():
