@@ -136,6 +136,11 @@ Run `tox` make sure all tests pass, then update the release notes and then do:
 
 == Release Notes
 
+=== Version 0.0.21, 2021-02-05
+
+- Finding text should never result in a `None`.
+
+
 === Version 0.0.20, 2021-02-04
 
 - Text should appear in the content of a `<text:p>` element within a cell.
