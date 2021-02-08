@@ -49,20 +49,25 @@ class XmlWriter():
         self.output.write(line.encode('utf8'))
 
     def start_tag(self, name, attrs):
-        self._write('<' + name + XmlWriter.atts_to_str(attrs) + '>\n')
+        self._write(f'<{name}{XmlWriter.atts_to_str(attrs)}>\n')
         self.indentation += 1
 
     def end_tag(self, name):
         self.indentation -= 1
-        self._write('</' + name + '>\n')
+        self._write(f'</{name}>\n')
 
     def simple_tag(self, name, attrs, contents=None):
         if contents is None:
-            self._write('<' + name + XmlWriter.atts_to_str(attrs) + '/>\n')
+            self._write(f'<{name}{XmlWriter.atts_to_str(attrs)}/>\n')
         else:
-            self._write('<' + name + XmlWriter.atts_to_str(attrs) + '>')
-            self._write(escape(contents), indent=False)
-            self._write('</' + name + '>\n', indent=False)
+            self._write(f'<{name}{XmlWriter.atts_to_str(attrs)}>')
+            content = escape(contents)
+            if name in (
+                    'text:a', 'text:h', 'text:meta', 'text:meta-field',
+                    'text:p', 'text:ruby-base', 'text:span'):
+                content = '<text:line-break/>'.join(content.splitlines())
+            self._write(content, indent=False)
+            self._write(f'</{name}>\n', indent=False)
 
 
 class SpreadsheetWriter():
@@ -501,7 +506,7 @@ class TextReader():
             elif name == 'text:span':
                 node = Span()
             else:
-                raise Exception("Node name " + name + " not recognized.")
+                raise Exception(f"Node name {name} not recognized.")
             if node_dom.hasAttributes():
                 attrs = node_dom.attributes
                 for i in range(len(attrs)):
@@ -523,5 +528,5 @@ class TextReader():
             if len(lnode) < len(fnode):
                 node = ' ' + node
         else:
-            raise Exception("Node type " + str(node_type) + " not recognized.")
+            raise Exception(f"Node type {node_type} not recognized.")
         parent_node.nodes.append(node)
