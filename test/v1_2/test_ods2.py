@@ -9,23 +9,31 @@ import odio
 def normalized_walk(path):
     return list(
         [os.path.relpath(pth, path), sorted(dirs), sorted(fls)]
-        for pth, dirs, fls in sorted(os.walk(path)))
+        for pth, dirs, fls in sorted(os.walk(path))
+    )
 
 
 def test_create_parse_spreadsheet(tmpdir):
-    TABLE_NAME = 'Plan'
+    TABLE_NAME = "Plan"
     ROW = [
-        "veni, vidi, vici", 0.3, 5, 5, odio.Formula('=B1 + C1'),
-        datetime.datetime(2015, 6, 30, 16, 38), None, "Dombey & Son", True]
-    fname = tmpdir.join('actual.ods')
-    with open(str(fname), 'wb') as f, \
-            odio.create_spreadsheet(f, '1.2') as sheet:
+        "veni, vidi, vici",
+        0.3,
+        5,
+        5,
+        odio.Formula("=B1 + C1"),
+        datetime.datetime(2015, 6, 30, 16, 38),
+        None,
+        "Dombey & Son",
+        True,
+    ]
+    fname = tmpdir.join("actual.ods")
+    with open(str(fname), "wb") as f, odio.create_spreadsheet(f, "1.2") as sheet:
         sheet.append_table(TABLE_NAME, [ROW])
-    actual_dir = str(tmpdir.mkdir('actual'))
+    actual_dir = str(tmpdir.mkdir("actual"))
     with zipfile.ZipFile(str(fname)) as z:
         z.extractall(actual_dir)
 
-    desired_dir = str(os.path.join(os.path.dirname(__file__), 'unpacked'))
+    desired_dir = str(os.path.join(os.path.dirname(__file__), "unpacked"))
 
     actual_walk = normalized_walk(actual_dir)
     desired_walk = normalized_walk(desired_dir)
@@ -35,16 +43,18 @@ def test_create_parse_spreadsheet(tmpdir):
         desired_pth, desired_dirs, desired_fls = desired_walk[i]
         for j, actual_fl in enumerate(actual_fls):
             desired_fl = desired_fls[j]
-            actual_f = open(os.path.join(actual_dir, actual_pth, actual_fl))
-            desired_f = open(
-                os.path.join(desired_dir, desired_pth, desired_fl))
-            ac = ''.join(actual_f)
-            de = ''.join(desired_f)
-            print(de)
-            print(ac)
-            assert ac == de
+            with open(
+                os.path.join(actual_dir, actual_pth, actual_fl)
+            ) as actual_f, open(
+                os.path.join(desired_dir, desired_pth, desired_fl)
+            ) as desired_f:
+                ac = "".join(actual_f)
+                de = "".join(desired_f)
+                assert ac == de
 
-    sheet = odio.parse_spreadsheet(open(str(fname), 'rb'))
+    with open(str(fname), "rb") as f:
+        sheet = odio.parse_spreadsheet(f)
+
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
     assert table.rows[0] == ROW
@@ -65,14 +75,14 @@ def test_parse_spreadsheet_cell_p():
 </table:table>"""
     dom = parseString(xml_str)
     result = odio.v1_2.TableReader(dom.documentElement)
-    assert result.rows[0][0] == 'electron'
+    assert result.rows[0][0] == "electron"
 
 
 def test_file_not_closed(tmpdir):
-    fname = tmpdir.join('test.ods')
-    f = open(str(fname), 'wb')
-    with odio.create_spreadsheet(f, '1.2') as sheet:
-        sheet.append_table('Keats', ('Season', 'of', 'mists'))
+    fname = tmpdir.join("test.ods")
+    f = open(str(fname), "wb")
+    with odio.create_spreadsheet(f, "1.2") as sheet:
+        sheet.append_table("Keats", ("Season", "of", "mists"))
     f.seek(0)
     f.close()
 
@@ -83,4 +93,4 @@ def test_get_text():
     dom = parseString(xml_str)
 
     val = odio.v1_2._get_text(dom)
-    assert val == ''
+    assert val == ""
