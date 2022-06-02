@@ -3,12 +3,16 @@ Odio
 ====
 
 A pure-Python library for the import / export of
-http://en.wikipedia.org/wiki/OpenDocument[ODF] (``.ods`` and ``.odt``) documents.
-Licensed under the http://opensource.org/licenses/MIT[MIT Licence]. Odio runs on Python
-3.7+ and supports ODF 1.1 and 1.2.
+`ODF <http://en.wikipedia.org/wiki/OpenDocument>`_ (``.ods`` and ``.odt``) documents.
+Licensed under the `MIT Licence <http://opensource.org/licenses/MIT>`_. Odio runs on
+Python 3.7+ and supports ODF 1.1 and 1.2.
 
 .. image:: https://github.com/tlocke/odio/workflows/odio/badge.svg
    :alt: Build Status
+
+.. contents:: Table of Contents
+   :depth: 1
+   :local:
 
 
 Installation
@@ -45,7 +49,10 @@ Create a spreadsheet:
 ...         [
 ...             [
 ...                 "veni, vidi, vici", 0.3, 5, odio.Formula('=B1 + C1'),
-...                 datetime.datetime(2015, 6, 30, 16, 38)]])
+...                 datetime.datetime(2015, 6, 30, 16, 38),
+...             ],
+...         ]
+...     )
 
 
 import the spreadsheet:
@@ -80,11 +87,14 @@ Create a text document:
 ...         P(
 ...             "From my grandfather ",
 ...             Span("Verus", text_style_name='Strong Emphasis'),
-...             " I learned good morals and the government of my temper."),
+...             " I learned good morals and the government of my temper."
+...         ),
 ...         P(
 ...             "From the reputation and remembrance of my father, "
 ...             "modesty and a ", Span("manly", text_style_name='Emphasis'),
-...             " character."))
+...             " character."
+...         )
+...      )
 
 parse the text document:
 
@@ -133,7 +143,7 @@ Release Notes
 Version 0.0.22, 2021-02-08
 ``````````````````````````
 
-- Substitute <text:line-break/> for line breaks.
+- Substitute ``<text:line-break/>`` for line breaks.
 
 
 Version 0.0.21, 2021-02-05
