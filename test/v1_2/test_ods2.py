@@ -1,9 +1,8 @@
 import datetime
 import os
-import zipfile
-from xml.dom.minidom import parseString
+from zipfile import ZipFile
 
-import odio
+from odio.v1_2 import Cell, create_spreadsheet, parse_document
 
 
 def normalized_walk(path):
@@ -15,22 +14,34 @@ def normalized_walk(path):
 
 def test_create_parse_spreadsheet(tmpdir):
     TABLE_NAME = "Plan"
+    py_1 = "veni, vidi, vici"
+    py_2 = 0.3
+    py_3 = py_4 = 5
+    py_5 = "=B1 + C1"
+    py_6 = datetime.datetime(2015, 6, 30, 16, 38)
+    py_7 = None
+    py_8 = "Dombey & Son"
+    py_9 = True
     ROW = [
-        "veni, vidi, vici",
-        0.3,
-        5,
-        5,
-        odio.Formula("=B1 + C1"),
-        datetime.datetime(2015, 6, 30, 16, 38),
-        None,
-        "Dombey & Son",
-        True,
+        py_1,
+        py_2,
+        py_3,
+        py_4,
+        Cell(formula=py_5),
+        py_6,
+        py_7,
+        py_8,
+        py_9,
     ]
     fname = tmpdir.join("actual.ods")
-    with open(str(fname), "wb") as f, odio.create_spreadsheet(f, "1.2") as sheet:
-        sheet.append_table(TABLE_NAME, [ROW])
+    sheet = create_spreadsheet()
+    table = sheet.append_table(TABLE_NAME)
+    table.append_row(ROW)
+
+    with open(str(fname), "wb") as f:
+        sheet.save(f)
     actual_dir = str(tmpdir.mkdir("actual"))
-    with zipfile.ZipFile(str(fname)) as z:
+    with ZipFile(str(fname)) as z:
         z.extractall(actual_dir)
 
     desired_dir = str(os.path.join(os.path.dirname(__file__), "unpacked"))
@@ -50,47 +61,37 @@ def test_create_parse_spreadsheet(tmpdir):
             ) as desired_f:
                 ac = "".join(actual_f)
                 de = "".join(desired_f)
+                print(ac)
+                print(de)
                 assert ac == de
 
     with open(str(fname), "rb") as f:
-        sheet = odio.parse_spreadsheet(f)
+        with ZipFile(f) as z:
+            sheet = parse_document(z)
 
     table = sheet.tables[0]
     assert table.name == TABLE_NAME
-    assert table.rows[0] == ROW
-
-
-def test_parse_spreadsheet_cell_p():
-    xml_str = """<?xml version="1.0" encoding="UTF-8"?>
-<table:table
-    xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-    xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-    xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-    table:name="table1">
-  <table:table-row>
-    <table:table-cell office:value-type="string">
-      <text:p>electron</text:p>
-    </table:table-cell>
-  </table:table-row>
-</table:table>"""
-    dom = parseString(xml_str)
-    result = odio.v1_2.TableReader(dom.documentElement)
-    assert result.rows[0][0] == "electron"
+    expected_row = [
+        py_1,
+        py_2,
+        py_3,
+        py_4,
+        py_5,
+        py_6,
+        py_7,
+        py_8,
+        py_9,
+    ]
+    actual_row = table.rows[0].get_values()
+    assert actual_row == expected_row
 
 
 def test_file_not_closed(tmpdir):
     fname = tmpdir.join("test.ods")
     f = open(str(fname), "wb")
-    with odio.create_spreadsheet(f, "1.2") as sheet:
-        sheet.append_table("Keats", ("Season", "of", "mists"))
+    sheet = create_spreadsheet()
+    table = sheet.append_table("Keats")
+    table.append_row(("Season", "of", "mists"))
+    sheet.save(f)
     f.seek(0)
     f.close()
-
-
-def test_get_text():
-    xml_str = """<?xml version="1.0" encoding="UTF-8"?>
-<cell></cell>"""
-    dom = parseString(xml_str)
-
-    val = odio.v1_2._get_text(dom)
-    assert val == ""

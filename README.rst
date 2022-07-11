@@ -28,90 +28,163 @@ then install Odio with pip::
   pip install odio
 
 
-Quickstart
-----------
+Examples
+--------
 
-Create a spreadsheet:
+Create And Save A Spreadsheet
+`````````````````````````````
 
->>> import odio
+>>> from odio.v1_2 import create_spreadsheet, Cell
 >>> import datetime
 >>> 
 >>>
 >>> # Create the spreadsheet.
->>> # Version is ODF version. Can be '1.1' or '1.2'. The default is '1.2'.
->>> # Default for 'compressed' is True.
->>> with open('test.ods', 'wb') as f, odio.create_spreadsheet(
-...         f, version='1.2', compressed=True) as sheet:
-...	
-...	# Add a table (tab) to the spreadsheet
-... 	sheet.append_table(
-...         'Plan',
-...         [
-...             [
-...                 "veni, vidi, vici", 0.3, 5, odio.Formula('=B1 + C1'),
-...                 datetime.datetime(2015, 6, 30, 16, 38),
-...             ],
-...         ]
-...     )
+>>> sheet = create_spreadsheet()
+>>>	
+>>> # Add a table (tab) to the spreadsheet
+>>> table = sheet.append_table('Plan')
+>>> table.append_row(
+...     [
+...         "veni, vidi, vici", 0.3, 5, Cell(formula='=B1 + C1'),
+...         datetime.datetime(2015, 6, 30, 16, 38),
+...     ]
+... )
+>>>
+>>> with open('test.ods', 'wb') as f:
+...     sheet.save(f)
 
 
-import the spreadsheet:
+Parse a spreadsheet
+```````````````````
 
->>> import odio
+>>> from odio import parse_document
 >>>
 >>>
 >>> # Parse the document we just created.
->>> # Version is ODF version. Can be '1.1' or '1.2'. The default is '1.2'.
 >>> with open('test.ods', 'rb') as f:
-...     sheet = odio.parse_spreadsheet(f)
+...     sheet = parse_document(f)
 >>>
 >>> table = sheet.tables[0]
 >>> print(table.name)
 Plan
 >>> for row in table.rows:
-...     print(row)
-['veni, vidi, vici', 0.3, 5.0, odio.Formula('=B1 + C1'), datetime.datetime(2015, 6, 30, 16, 38)]
+...     print(row.get_values())
+['veni, vidi, vici', 0.3, 5.0, '=B1 + C1', datetime.datetime(2015, 6, 30, 16, 38)]
 
 
-Create a text document:
+Create And Save A Text Document
+```````````````````````````````
 
->>> from odio import create_text, P, H, Span
+>>> from odio.v1_2 import create_text, P, H1, H2, Span
 >>> 
 >>>
->>> # Create the text document. The ODF version string can be '1.2' or '1.1'
->>> with open('test.odt', 'wb') as f, create_text(f, '1.2') as txt:
-...	
-...     txt.append(
-...         P("The Meditations", text_style_name='Title'),
-...         H("Book One", text_style_name='Heading 1'),
-...         P(
-...             "From my grandfather ",
-...             Span("Verus", text_style_name='Strong Emphasis'),
-...             " I learned good morals and the government of my temper."
-...         ),
-...         P(
-...             "From the reputation and remembrance of my father, "
-...             "modesty and a ", Span("manly", text_style_name='Emphasis'),
-...             " character."
-...         )
-...      )
+>>> txt = create_text()
+>>>	
+>>> txt.children.append(H1("The Meditations"))
+>>> txt.children.append(H2("Book One"))
+>>> txt.children.append(
+...     P(
+...         "From my grandfather Verus: the lessons of noble character ",
+...         "and even temper."
+...     )
+... )
+>>> txt.children.append(
+...     P(
+...         "From my father's reputation and my memory of "
+...         "him: modesty and manliness."
+...     )
+... )
+>>>
+>>> with open('test.odt', 'wb') as f:
+...     txt.save(f)
 
-parse the text document:
 
->>> import odio
+Parse a text document
+`````````````````````
+
+>>> from odio import parse_document
 >>>
 >>>
->>> # Parse the text document we just created. Can be ODF 1.1 or 1.2 format.
->>> txt = odio.parse_text(open('test.odt', "rb"))
+>>> # Parse the text document we just created.
+>>> txt = parse_document(open('test.odt', "rb"))
 >>> 
->>> # Find a subnode
->>> subnode = txt.nodes[2] 
->>> print(subnode.name)
+>>> # Find a child
+>>> child = txt.children[2] 
+>>> print(child.tag_name)
 text:p
->>> print(subnode.attributes['text_style_name'])
-Text Body
->>> print(subnode)
-odio.P(' From my grandfather ', odio.Span('Verus', text_style_name='Strong Emphasis'), ' I learned good morals and the government of my temper. ')
+>>>
+>>> print(child)
+<text:p>
+  From my grandfather Verus I learned good morals and the government of my temper. ')
+
+
+Hyperlinks
+``````````
+
+In a text document:
+
+>>> from odio import A, P, create_text
+>>>
+>>> txt = create_text()
+>>> txt.append(
+...     P("The 12 books of "),
+...     A("The Meditations", href="https://en.wikipedia.org/wiki/Meditations"),
+...     P(" is written in Greek")
+... )
+>>>
+>>> print(txt.nodes[1].href)
+https://en.wikipedia.org/wiki/Meditations
+
+and within a cell of a spreadsheet:
+
+>>> sheet = create_spreadsheet()
+>>> row = [
+...     Cell(
+...         P("The 12 books of "),
+...         A("The Meditations", href="https://en.wikipedia.org/wiki/Meditations"),
+...         P(" is written in Greek")
+...     ),
+... ]
+>>>
+>>> table = sheet.append_table('Book IX', [row])
+>>>
+>>> cell = table.rows[0][0]
+>>> print(cell)
+>>> print(cell.nodes[1].href)
+
+
+Style
+`````
+
+>>> from odio.v1_2 import create_text, P, H, Span
+>>> 
+>>>
+>>> txt = create_text()
+>>>	
+>>> txt.children.append(
+...     H1("The Meditations", text_style_name='Title'),
+...     H("Book One", text_style_name='Heading 1'),
+...     P(
+...         "From my grandfather ",
+...         Span("Verus", text_style_name='Strong Emphasis'),
+...         " I learned good morals and the government of my temper."
+...     ),
+...     P(
+...         "From the reputation and remembrance of my father, "
+...         "modesty and a ", Span("manly", text_style_name='Emphasis'),
+...         " character."
+...     )
+... )
+>>>
+>>> with open('test.odt', 'wb') as f:
+>>>     txt.save(f)
+References
+----------
+
+- `ODF 1.1
+  <http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1-html/OpenDocument-v1.1.html>`_
+
+- `ODF 1.2 <https://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2.html>`_
 
 
 Regression Tests

@@ -6,11 +6,11 @@ import odio.v1_2
 from odio.common import H, P, Span
 
 
-def create_spreadsheet(f, version="1.2", compressed=True):
+def create_spreadsheet(version="1.2"):
     if version == "1.1":
-        return odio.v1_1.SpreadsheetWriter(f, compressed)
+        return odio.v1_1.create_spreadsheet()
     elif version == "1.2":
-        return odio.v1_2.SpreadsheetWriter(f, compressed)
+        return odio.v1_2.create_spreadsheet()
     else:
         raise Exception(
             f"The version '{version}' isn't recognized. The valid version strings "
@@ -18,22 +18,20 @@ def create_spreadsheet(f, version="1.2", compressed=True):
         )
 
 
-def parse_spreadsheet(f):
+def parse_document(f):
     with zipfile.ZipFile(f, "r") as z:
-        content = z.read("content.xml")
-    dom = xml.dom.minidom.parseString(content)
-    version = dom.documentElement.getAttribute("office:version")
-    spreadsheet_elem = dom.getElementsByTagName("office:spreadsheet")[0]
+        dom = xml.dom.minidom.parseString(z.read("META-INF/manifest.xml"))
+        version = dom.documentElement.getAttribute("manifest:version")
 
-    if version == "1.1":
-        return odio.v1_1.SpreadsheetReader(spreadsheet_elem)
-    elif version == "1.2":
-        return odio.v1_2.SpreadsheetReader(spreadsheet_elem)
-    else:
-        raise Exception(
-            "The version '{version}' isn't recognized. The valid version strings "
-            "are '1.1' and '1.2'."
-        )
+        if version == "1.1":
+            return odio.v1_1.parser.parse_node(dom)
+        elif version == "1.2":
+            return odio.v1_2.parse_document(z)
+        else:
+            raise Exception(
+                "The version '{version}' isn't recognized. The valid version strings "
+                "are '1.1' and '1.2'."
+            )
 
 
 class Formula:
